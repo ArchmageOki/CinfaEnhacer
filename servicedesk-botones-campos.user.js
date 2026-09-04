@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         ServiceDesk - Botones Rápidos de Campos
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Botones compactos a la izquierda de Estado, Grupo Asignado, Técnico, Tipo de ticket, Vía ticket y Ubicación
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
 // @updateURL    https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-botones-campos.user.js
 // @downloadURL  https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-botones-campos.user.js
+// @grant        GM_registerMenuCommand
 // @grant        unsafeWindow
 // @run-at       document-start
 // ==/UserScript==
@@ -15,9 +16,34 @@
     'use strict';
 
     // =========================================================================
-    // ⚙️ CONFIGURACIÓN GLOBAL (Modificar aquí el nombre del técnico por defecto)
+    // ⚙️ GESTIÓN COMPARTIDA DE TÉCNICO (Persistente y compartida entre scripts)
     // =========================================================================
-    const TECNICO_DEFECTO = 'Juanma';
+    function obtenerNombreTecnico() {
+        let nombre = localStorage.getItem('sdp_tecnico_nombre');
+        while (!nombre || !nombre.trim()) {
+            nombre = prompt('⚙️ Configuración ServiceDesk:\nIntroduce tu nombre de técnico (tal como aparece en SDP):', 'Juanma');
+            if (nombre && nombre.trim()) {
+                localStorage.setItem('sdp_tecnico_nombre', nombre.trim());
+            } else {
+                alert('El nombre de técnico es obligatorio para las funciones automáticas.');
+            }
+        }
+        return localStorage.getItem('sdp_tecnico_nombre');
+    }
+
+    if (typeof GM_registerMenuCommand === 'function') {
+        GM_registerMenuCommand('✏️ Configurar nombre de Técnico', () => {
+            const actual = localStorage.getItem('sdp_tecnico_nombre') || '';
+            const nuevo = prompt('Introduce tu nuevo nombre de técnico:', actual);
+            if (nuevo && nuevo.trim()) {
+                localStorage.setItem('sdp_tecnico_nombre', nuevo.trim());
+                alert(`Nombre actualizado a: ${nuevo.trim()}.\nSe recargará la página para aplicar los cambios.`);
+                location.reload();
+            }
+        });
+    }
+
+    const TECNICO_DEFECTO = obtenerNombreTecnico();
 
     function esModoValido() {
         const url = window.location.href;
