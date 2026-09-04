@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.7
+// @version      2.8
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -1590,7 +1590,7 @@
     const RESOLUCIONES = [
         {
             titulo: "✳️ Instrucciones de TIM",
-            obtenerTexto: () => `Para cambiar tu contraseña debes acceder a TIM desde el siguiente enlace<br><br>
+            obtenerTexto: () => `Para cambiar tu contraseña debes acceder a TIM desde un ordenador de Cinfa a través del siguiente enlace:<br><br>
             <a href="http://virtualpassword.cinfa.com/Tim/Index" target="_blank">http://virtualpassword.cinfa.com/Tim/Index</a><br><br>
             Deberás iniciar sesión con el número de tu tarjeta blanca de Cinfa y tu DNI con la letra mayúscula.<br>
             Dentro de TIM tienes las siguientes opciones:<br><br>
