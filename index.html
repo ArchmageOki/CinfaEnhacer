@@ -1,54 +1,380 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Acceso Scripts ServiceDesk</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; background: #f4f6f8; }
-    .card { max-width: 550px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    h2 { margin-top: 0; color: #1a73e8; }
-    p { color: #555; font-size: 14px; }
-    .btn { display: block; padding: 10px 15px; margin: 10px 0; background: #f1f3f4; border: 1px solid #dadce0; border-radius: 4px; text-decoration: none; color: #202124; font-weight: 600; text-align: left; }
-    .btn:hover { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
-    .btn span { display: block; font-size: 11px; font-weight: normal; color: #70757a; }
-    input[type="password"] { width: 100%; padding: 8px; box-sizing: border-box; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
-    button.login-btn { background: #1a73e8; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: 600; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinfaEnhancer | Hub de Scripts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0b0f19;
+            --surface-card: #111827;
+            --surface-hover: #1f2937;
+            --primary: #3b82f6;
+            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            --accent-vozitel: #10b981;
+            --accent-vozitel-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --border-color: #1f293d;
+            --border-hover: #374151;
+            --text-main: #f9fafb;
+            --text-secondary: #94a3b8;
+            --badge-bg: rgba(59, 130, 246, 0.1);
+            --badge-border: rgba(59, 130, 246, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 860px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .badge-system {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: var(--badge-bg);
+            border: 1px solid var(--badge-border);
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #60a5fa;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            box-shadow: 0 0 8px #3b82f6;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 540px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background-color: var(--surface-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 1.5rem;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--card-accent, var(--primary));
+            opacity: 0.8;
+        }
+
+        .card-sdp {
+            --card-accent: #3b82f6;
+        }
+
+        .card-vozitel {
+            --card-accent: #10b981;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-hover);
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .card-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-env {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 8px;
+            border-radius: 4px;
+            width: fit-content;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .card-version {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .features-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .features-list li {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .features-list li::before {
+            content: "•";
+            color: var(--card-accent, var(--primary));
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .features-list strong {
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .btn-install {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: #ffffff;
+            background: var(--primary-gradient);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-install-vozitel {
+            background: var(--accent-vozitel-gradient);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-install:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .btn-install:active {
+            transform: translateY(0);
+        }
+
+        .btn-install svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .footer-note {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .footer-links a:hover {
+            color: #f1f5f9;
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .card-version {
+                align-self: flex-start;
+            }
+            footer {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <div id="login-box">
-      <h2>Acceso Restringido</h2>
-      <p>Introduce la clave del equipo para acceder a los instaladores:</p>
-      <input type="password" id="passInput" placeholder="Contraseña">
-      <button class="login-btn" onclick="verificar()">Entrar</button>
-      <p id="errorMsg" style="color: red; display: none;">Contraseña incorrecta</p>
+
+    <div class="container">
+        
+        <header>
+            <div class="badge-system">
+                <span class="badge-dot"></span>
+                <span>Tampermonkey Workspace</span>
+            </div>
+            <h1>CinfaEnhancer</h1>
+            <p class="subtitle">Ecosistema de scripts optimizados para el flujo operativo diario en ServiceDesk Plus y Vozitel.</p>
+        </header>
+
+        <main class="grid">
+
+            <!-- Card 1: ServiceDesk Suite -->
+            <article class="card card-sdp">
+                <div>
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <h2 class="card-title">ServiceDesk Suite</h2>
+                            <span class="card-env">servicedesk.helphone.com:8181</span>
+                        </div>
+                        <span class="card-version">v2.0</span>
+                    </div>
+
+                    <ul class="features-list" style="margin-top: 1.25rem;">
+                        <li><span><strong>Automatización integral:</strong> Cabecera con fecha y técnico en la descripción con un clic[cite: 1].</span></li>
+                        <li><span><strong>Tipificación rápida:</strong> Botones para Estado, Grupo, Técnico, Tipo, Vía y Ubicación[cite: 1].</span></li>
+                        <li><span><strong>Cierre y resolución:</strong> Cerrar/Rechazar directo con fecha, guardado y foco de texto[cite: 1].</span></li>
+                        <li><span><strong>Catálogo de plantillas:</strong> Selectores de formularios completos y resoluciones prediseñadas[cite: 1].</span></li>
+                    </ul>
+                </div>
+
+                <a href="servicedesk-suite.user.js" class="btn-install">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Instalar ServiceDesk Suite</span>
+                </a>
+            </article>
+
+            <!-- Card 2: Vozitel Bridge -->
+            <article class="card card-vozitel">
+                <div>
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <h2 class="card-title">Vozitel Integration</h2>
+                            <span class="card-env">apps7v20.vozitel.com[cite: 1]</span>
+                        </div>
+                        <span class="card-version">v1.0[cite: 1]</span>
+                    </div>
+
+                    <ul class="features-list" style="margin-top: 1.25rem;">
+                        <li><span><strong>Captura de medios:</strong> Recuperación de imágenes Base64 anidadas dentro de iframes[cite: 1].</span></li>
+                        <li><span><strong>Formateo de correo:</strong> Normaliza Remitente y Destinatario para ServiceDesk[cite: 1].</span></li>
+                        <li><span><strong>Control flotante:</strong> Botón arrastrable con guardado de posición en pantalla[cite: 1].</span></li>
+                        <li><span><strong>Copiado limpio:</strong> Portapapeles sincronizado en texto plano y enriquecido[cite: 1].</span></li>
+                    </ul>
+                </div>
+
+                <a href="vozitel-copiar-correo.user.js" class="btn-install btn-install-vozitel">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Instalar Vozitel Bridge</span>
+                </a>
+            </article>
+
+        </main>
+
+        <footer>
+            <div class="footer-note">
+                <span>Requisito previo: Extensión <strong>Tampermonkey</strong> activa en el navegador.</span>
+            </div>
+            <div class="footer-links">
+                <a href="https://github.com/ArchmageOki/CinfaEnhacer" target="_blank" rel="noopener noreferrer">Repositorio en GitHub</a>
+            </div>
+        </footer>
+
     </div>
 
-    <div id="scripts-box" style="display: none;">
-      <h2>Scripts para ServiceDesk Plus</h2>
-      <p>Haz clic en cada uno para instalarlo en Tampermonkey:</p>
-      <a class="btn" href="servicedesk-cabecera.user.js">1. Cabecera en descripción <span>Inserta fecha y técnico</span></a>
-      <a class="btn" href="servicedesk-botones-campos.user.js">2. Botones Rápidos de Campos <span>Atajos Estado, Grupo, etc.</span></a>
-      <a class="btn" href="servicedesk-cerrar-rechazar.user.js">3. Cerrar / Rechazar / Remitente <span>Cierre y remitente rápido</span></a>
-      <a class="btn" href="servicedesk-plantillas.user.js">4. Plantillas para tickets <span>Desplegable Select2</span></a>
-      <a class="btn" href="vozitel-copiar-correo.user.js">5. Vozitel a ServiceDesk <span>Copiar correos</span></a>
-      <a class="btn" href="servicedesk-resoluciones.user.js">6. Plantillas de Resolución <span>Desplegable en el editor de resolución</span></a>
-    </div>
-  </div>
-
-  <script>
-    const CLAVE_CORRECTA = "XCINFA";
-
-    function verificar() {
-      const input = document.getElementById('passInput').value;
-      if (input === CLAVE_CORRECTA) {
-        document.getElementById('login-box').style.display = 'none';
-        document.getElementById('scripts-box').style.display = 'block';
-      } else {
-        document.getElementById('errorMsg').style.display = 'block';
-      }
-    }
-  </script>
 </body>
 </html>
