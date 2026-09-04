@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         ServiceDesk - Plantillas de Resolución
 // @namespace    http://tampermonkey.net/
-// @version      1.2
-// @description  Selector Select2 con buscador integrado en la cabecera del panel de resolución
+// @version      1.3
+// @description  Selector Select2 integrado a la derecha de la barra de herramientas del editor Ze sin romper estilos
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
 // @updateURL    https://archmageoki.github.io/CinfaEnhacer/servicedesk-resoluciones.user.js
@@ -61,151 +61,135 @@
     const wait = ms => new Promise(res => setTimeout(res, ms));
 
     // =========================================================================
-    // 🎨 ESTILOS (Sin modificar contenedores nativos de SDP)
+    // 🎨 ESTILOS (Cero alteraciones en clases nativas de SDP)
     // =========================================================================
-    const cssId = 'sdp-res-templates-style';
+    const cssId = 'sdp-res-toolbar-style';
     if (!document.getElementById(cssId)) {
         const estilo = document.createElement('style');
         estilo.id = cssId;
         estilo.innerHTML = `
             #sdp-res-select2-wrapper {
-                display: inline-block;
-                position: relative;
-                vertical-align: middle;
-                margin-left: 20px;
-                width: 220px;
-                font-family: Arial, Helvetica, sans-serif;
-                user-select: none;
-                font-weight: normal;
-                font-size: 12px;
-                z-index: 9999;
+                float: right !important;
+                margin-top: 2px !important;
+                margin-right: 6px !important;
+                width: 190px !important;
+                font-family: Arial, Helvetica, sans-serif !important;
+                user-select: none !important;
+                position: relative !important;
+                line-height: normal !important;
             }
 
             .sdp-res-choice {
-                display: block;
-                height: 26px;
-                padding: 0 0 0 8px;
-                overflow: hidden;
-                position: relative;
-                border: 1px solid #d2d2d2;
-                white-space: nowrap;
-                line-height: 24px;
-                color: #444444;
-                text-decoration: none;
-                border-radius: 3px;
-                background-color: #fcfcfc;
-                cursor: pointer;
-                box-sizing: border-box;
-                transition: border-color 0.15s;
+                display: block !important;
+                height: 22px !important;
+                padding: 0 0 0 7px !important;
+                overflow: hidden !important;
+                position: relative !important;
+                border: 1px solid #c9c9c9 !important;
+                white-space: nowrap !important;
+                line-height: 20px !important;
+                color: #444444 !important;
+                text-decoration: none !important;
+                border-radius: 3px !important;
+                background-color: #fafafa !important;
+                cursor: pointer !important;
+                box-sizing: border-box !important;
+                font-size: 11px !important;
+                font-weight: 600 !important;
+                transition: border-color 0.15s !important;
             }
 
             .sdp-res-choice:hover {
-                border-color: #b0b0b0;
-            }
-
-            #sdp-res-select2-wrapper.is-open .sdp-res-choice {
-                border-bottom-left-radius: 0;
-                border-bottom-right-radius: 0;
-                border-color: #aaa;
-                background: #fff;
+                background-color: #f0f0f0 !important;
+                border-color: #999999 !important;
+                color: #111 !important;
             }
 
             .sdp-res-chosen {
-                margin-right: 24px;
-                display: block;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                font-weight: 600;
-                font-size: 11px;
+                margin-right: 20px !important;
+                display: block !important;
+                overflow: hidden !important;
+                white-space: nowrap !important;
+                text-overflow: ellipsis !important;
             }
 
             .sdp-res-arrow {
-                display: inline-block;
-                width: 18px;
-                height: 100%;
-                position: absolute;
-                right: 0;
-                top: 0;
-                border-left: 1px solid #e2e2e2;
-                background: #f7f7f7;
-                border-top-right-radius: 3px;
-                border-bottom-right-radius: 3px;
+                display: inline-block !important;
+                width: 16px !important;
+                height: 100% !important;
+                position: absolute !important;
+                right: 0 !important;
+                top: 0 !important;
+                border-left: 1px solid #e0e0e0 !important;
+                background: #f4f4f4 !important;
+                border-top-right-radius: 2px !important;
+                border-bottom-right-radius: 2px !important;
             }
 
             .sdp-res-arrow b {
-                border-color: #666 transparent transparent transparent;
-                border-style: solid;
-                border-width: 4px 4px 0 4px;
-                height: 0;
-                left: 50%;
-                margin-left: -4px;
-                margin-top: -2px;
-                position: absolute;
-                top: 50%;
-                width: 0;
+                border-color: #666 transparent transparent transparent !important;
+                border-style: solid !important;
+                border-width: 4px 4px 0 4px !important;
+                height: 0 !important;
+                left: 50% !important;
+                margin-left: -4px !important;
+                margin-top: -2px !important;
+                position: absolute !important;
+                top: 50% !important;
+                width: 0 !important;
             }
 
-            #sdp-res-select2-wrapper.is-open .sdp-res-arrow b {
-                border-color: transparent transparent #666 transparent;
-                border-width: 0 4px 4px 4px;
-            }
-
-            .sdp-res-drop {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 250px;
-                background: #fff;
-                border: 1px solid #aaa;
-                border-top: 0;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-                border-radius: 0 0 3px 3px;
-                z-index: 999999;
+            /* Desplegable montado en document.body para evitar overflow */
+            #sdp-res-portal-drop {
+                position: fixed !important;
+                width: 240px !important;
+                background: #ffffff !important;
+                border: 1px solid #aaa !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+                border-radius: 3px !important;
+                z-index: 2147483647 !important;
                 display: none;
-                box-sizing: border-box;
-                margin-top: -1px;
-                padding-top: 4px;
-            }
-
-            #sdp-res-select2-wrapper.is-open .sdp-res-drop {
-                display: block;
+                box-sizing: border-box !important;
+                padding-top: 4px !important;
+                font-family: Arial, Helvetica, sans-serif !important;
             }
 
             .sdp-res-search {
-                padding: 4px 6px;
+                padding: 4px 6px !important;
+                box-sizing: border-box !important;
             }
 
             .sdp-res-search input {
-                width: 100%;
-                height: 24px;
-                padding: 2px 6px;
-                font-size: 11px;
-                font-family: inherit;
-                border: 1px solid #aaa;
-                border-radius: 2px;
-                outline: none;
-                box-sizing: border-box;
+                width: 100% !important;
+                height: 24px !important;
+                padding: 2px 6px !important;
+                font-size: 11px !important;
+                font-family: inherit !important;
+                border: 1px solid #aaa !important;
+                border-radius: 2px !important;
+                outline: none !important;
+                box-sizing: border-box !important;
+                background: #fff !important;
             }
 
             .sdp-res-results {
-                max-height: 210px;
-                padding: 3px 0;
-                margin: 0;
-                overflow-x: hidden;
-                overflow-y: auto;
-                list-style: none;
+                max-height: 210px !important;
+                padding: 3px 0 !important;
+                margin: 0 !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                list-style: none !important;
             }
 
             .sdp-res-results li {
-                padding: 5px 8px;
-                font-size: 11px;
-                color: #333;
-                cursor: pointer;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                line-height: 16px;
+                padding: 5px 8px !important;
+                font-size: 11px !important;
+                color: #333 !important;
+                cursor: pointer !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                line-height: 16px !important;
             }
 
             .sdp-res-results li:hover {
@@ -257,28 +241,9 @@
     ];
 
     // =========================================================================
-    // 💉 SOBRESCRITURA DE RESOLUCIÓN Y APERTURA DE PANEL
+    // 💉 INSERCIÓN Y SOBRESCRITURA
     // =========================================================================
-    async function asegurarPanelAbierto() {
-        const panel = document.getElementById('rfres-panel1-zc');
-        const contentBox = document.getElementById('rf-resolutionBox');
-
-        const estaCerradoPorAttr = panel && panel.getAttribute('aria-expanded') === 'false';
-        const estaCerradoPorEstilo = contentBox && (contentBox.style.display === 'none' || getComputedStyle(contentBox).display === 'none');
-
-        if (estaCerradoPorAttr || estaCerradoPorEstilo) {
-            const heading = document.querySelector('z-cpheading.zcollapsiblepanel__heading') || (panel ? panel.querySelector('.zcollapsiblepanel__header') : null);
-            if (heading) {
-                const toggleBtn = heading.querySelector('.p10') || heading;
-                toggleBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-                await wait(250);
-            }
-        }
-    }
-
     async function sobrescribirResolucion(htmlContent) {
-        await asegurarPanelAbierto();
-
         const resolutionBox = document.getElementById('rf-resolutionBox') || document.querySelector('.desc-row[data-fname="resolution.content"]');
         if (!resolutionBox) return false;
 
@@ -312,7 +277,7 @@
             }
         }
 
-        // 2. Textarea nativo de sincronización
+        // 2. Textarea oculto
         const textarea = document.getElementById('form_req-form_resolution_content') || resolutionBox.querySelector('textarea[name="resolution.content"]');
         if (textarea) {
             const tempDiv = document.createElement('div');
@@ -327,15 +292,115 @@
     }
 
     // =========================================================================
-    // 🛠️ INYECCIÓN EN LA CABECERA DE RESOLUCIÓN
+    // 🛠️ CREACIÓN DEL MENÚ PORTAL GLOBAL
+    // =========================================================================
+    let portalDrop = null;
+    let portalInput = null;
+    let portalList = null;
+    let activeChoiceBtn = null;
+
+    function asegurarPortal() {
+        if (portalDrop) return portalDrop;
+
+        portalDrop = document.createElement('div');
+        portalDrop.id = 'sdp-res-portal-drop';
+
+        const searchDiv = document.createElement('div');
+        searchDiv.className = 'sdp-res-search';
+        portalInput = document.createElement('input');
+        portalInput.type = 'text';
+        portalInput.autocomplete = 'off';
+        portalInput.placeholder = 'Buscar resolución...';
+        searchDiv.appendChild(portalInput);
+        portalDrop.appendChild(searchDiv);
+
+        portalList = document.createElement('ul');
+        portalList.className = 'sdp-res-results';
+
+        RESOLUCIONES.forEach(resItem => {
+            const li = document.createElement('li');
+            li.innerText = resItem.titulo;
+            li.title = resItem.titulo;
+
+            li.addEventListener('mousedown', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                cerrarPortal();
+
+                if (activeChoiceBtn) {
+                    const chosenSpan = activeChoiceBtn.querySelector('.sdp-res-chosen');
+                    chosenSpan.innerText = '⏳ Aplicando...';
+
+                    await sobrescribirResolucion(resItem.obtenerTexto());
+
+                    activeChoiceBtn.classList.add('is-done');
+                    chosenSpan.innerText = `✔ ${resItem.titulo.replace(/^[^\w]+/g, '').split(' ')[0] || 'Listo'}`;
+                    await wait(800);
+                    activeChoiceBtn.classList.remove('is-done');
+                    chosenSpan.innerText = '📝 Resolución';
+                }
+            });
+
+            portalList.appendChild(li);
+        });
+
+        portalDrop.appendChild(portalList);
+
+        portalInput.addEventListener('input', () => {
+            const filtro = portalInput.value.toLowerCase().trim();
+            portalList.querySelectorAll('li').forEach(li => {
+                const coincide = li.innerText.toLowerCase().includes(filtro);
+                li.style.display = coincide ? 'block' : 'none';
+            });
+        });
+
+        portalDrop.addEventListener('mousedown', (e) => e.stopPropagation());
+        document.body.appendChild(portalDrop);
+
+        document.addEventListener('click', (e) => {
+            if (portalDrop.style.display === 'block' && !portalDrop.contains(e.target) && (!activeChoiceBtn || !activeChoiceBtn.contains(e.target))) {
+                cerrarPortal();
+            }
+        });
+
+        window.addEventListener('resize', cerrarPortal);
+        window.addEventListener('scroll', cerrarPortal, true);
+
+        return portalDrop;
+    }
+
+    function abrirPortal(choiceBtn) {
+        asegurarPortal();
+        activeChoiceBtn = choiceBtn;
+
+        const rect = choiceBtn.getBoundingClientRect();
+        portalDrop.style.top = `${rect.bottom + 2}px`;
+        portalDrop.style.left = `${Math.max(10, rect.right - 240)}px`;
+        portalDrop.style.display = 'block';
+
+        portalInput.value = '';
+        portalInput.dispatchEvent(new Event('input'));
+        setTimeout(() => portalInput.focus(), 60);
+    }
+
+    function cerrarPortal() {
+        if (portalDrop) {
+            portalDrop.style.display = 'none';
+            activeChoiceBtn = null;
+        }
+    }
+
+    // =========================================================================
+    // 🛠️ INYECCIÓN FLOTANTE DENTRO DE LA BARRA DE HERRAMIENTAS
     // =========================================================================
     function inyectarBotonResoluciones() {
         if (!esModoValido()) return;
         if (document.getElementById('sdp-res-select2-wrapper')) return;
 
-        // Inyectamos dentro del div .p10 de la cabecera de resolución
-        const headingDiv = document.querySelector('z-cpheading.zcollapsiblepanel__heading .p10');
-        if (!headingDiv) return;
+        // Contenedor interno de la barra de botones del editor Ze de resolución
+        const toolbarDiv = document.querySelector('#resolution\\.content_control .ze_SCmb > div');
+        if (!toolbarDiv) return;
 
         const wrapper = document.createElement('div');
         wrapper.id = 'sdp-res-select2-wrapper';
@@ -345,86 +410,25 @@
         choice.href = 'javascript:void(0)';
         choice.tabIndex = -1;
         choice.innerHTML = `
-            <span class="sdp-res-chosen">📝 Plantilla Resolución</span>
+            <span class="sdp-res-chosen">📝 Resolución</span>
             <span class="sdp-res-arrow" role="presentation"><b role="presentation"></b></span>
         `;
-
-        const drop = document.createElement('div');
-        drop.className = 'sdp-res-drop';
-
-        const searchDiv = document.createElement('div');
-        searchDiv.className = 'sdp-res-search';
-        const searchInput = document.createElement('input');
-        searchInput.type = 'text';
-        searchInput.autocomplete = 'off';
-        searchInput.placeholder = 'Buscar resolución...';
-        searchDiv.appendChild(searchInput);
-        drop.appendChild(searchDiv);
-
-        const resultsList = document.createElement('ul');
-        resultsList.className = 'sdp-res-results';
-
-        RESOLUCIONES.forEach(resItem => {
-            const li = document.createElement('li');
-            li.innerText = resItem.titulo;
-            li.title = resItem.titulo;
-
-            li.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                wrapper.classList.remove('is-open');
-
-                const chosenSpan = choice.querySelector('.sdp-res-chosen');
-                chosenSpan.innerText = '⏳ Aplicando...';
-
-                await sobrescribirResolucion(resItem.obtenerTexto());
-
-                choice.classList.add('is-done');
-                chosenSpan.innerText = `✔ ${resItem.titulo.replace(/^[^\w]+/g, '').split(' ')[0] || 'Listo'}`;
-                await wait(800);
-                choice.classList.remove('is-done');
-                chosenSpan.innerText = '📝 Plantilla Resolución';
-            });
-
-            resultsList.appendChild(li);
-        });
-
-        drop.appendChild(resultsList);
-        wrapper.appendChild(choice);
-        wrapper.appendChild(drop);
-
-        searchInput.addEventListener('input', () => {
-            const filtro = searchInput.value.toLowerCase().trim();
-            resultsList.querySelectorAll('li').forEach(li => {
-                const coincide = li.innerText.toLowerCase().includes(filtro);
-                li.style.display = coincide ? 'block' : 'none';
-            });
-        });
-
-        // Evitar que el clic en el selector repliegue el panel acordeón de SDP
-        wrapper.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
 
         choice.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            const isOpen = wrapper.classList.toggle('is-open');
-            if (isOpen) {
-                searchInput.value = '';
-                searchInput.dispatchEvent(new Event('input'));
-                setTimeout(() => searchInput.focus(), 60);
+
+            if (portalDrop && portalDrop.style.display === 'block' && activeChoiceBtn === choice) {
+                cerrarPortal();
+            } else {
+                abrirPortal(choice);
             }
         });
 
-        document.addEventListener('click', (e) => {
-            if (!wrapper.contains(e.target)) {
-                wrapper.classList.remove('is-open');
-            }
-        });
+        choice.addEventListener('mousedown', (e) => e.stopPropagation());
 
-        headingDiv.appendChild(wrapper);
+        wrapper.appendChild(choice);
+        toolbarDiv.insertBefore(wrapper, toolbarDiv.firstChild);
     }
 
     const observer = new MutationObserver(() => {
