@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ServiceDesk - Plantillas de Resolución
 // @namespace    http://tampermonkey.net/
-// @version      1.8
+// @version      1.9
 // @description  Selector Select2 perfectamente alineado en la barra de herramientas del editor Ze
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -212,28 +212,9 @@
             La contraseña de GII y SAP debe tener entre 8 y 12 caracteres de longitud y no tiene los requisitos anteriores.`
         },
         {
-            titulo: "✅ Resuelto estándar",
-            obtenerTexto: () => `Se realizan las comprobaciones pertinentes y se da por resuelta la petición.<br><br><b>${getFechaHoy()} - ${TECNICO_DEFECTO}</b>`
-        },
-        {
-            titulo: "📞 Sin respuesta del usuario",
-            obtenerTexto: () => `Se intenta contactar con el usuario mediante llamada y correo sin obtener respuesta. Se procede al cierre del ticket. Si persiste la incidencia, por favor reabrir.<br><br><b>${getFechaHoy()} - ${TECNICO_DEFECTO}</b>`
-        },
-        {
-            titulo: "👤 Resuelto por el usuario",
-            obtenerTexto: () => `El propio usuario confirma que ya funciona correctamente o no requiere asistencia adicional.<br><br><b>${getFechaHoy()} - ${TECNICO_DEFECTO}</b>`
-        },
-        {
-            titulo: "🏢 Escalado / Trámite externo",
-            obtenerTexto: () => `Se deriva la gestión a proveedor / soporte externo correspondiente para su tramitación.<br><br><b>${getFechaHoy()} - ${TECNICO_DEFECTO}</b>`
-        },
-        {
-            titulo: "🔑 Contraseña / Acceso restablecido",
-            obtenerTexto: () => `Se procede al restablecimiento de las credenciales de acceso y se valida el correcto inicio de sesión junto al usuario.<br><br><b>${getFechaHoy()} - ${TECNICO_DEFECTO}</b>`
-        },
-        {
-            titulo: "🧹 Limpiar resolución",
-            obtenerTexto: () => ``
+            titulo: "❌ Ticket rechazado",
+            obtenerTexto: () => `Hemos intentado contactar contigo en los últimos días pero no hemos obtenido respuesta.<br>
+            Si aún necesitas asistencia contáctanos a través de helpdesk@cinfa.com o llamando al 1599.`
         }
     ];
 
