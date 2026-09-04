@@ -2,27 +2,52 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Instalador Scripts ServiceDesk</title>
+  <title>Acceso Scripts ServiceDesk</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; background: #f4f6f8; }
     .card { max-width: 550px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     h2 { margin-top: 0; color: #1a73e8; }
     p { color: #555; font-size: 14px; }
-    .btn { display: block; padding: 10px 15px; margin: 10px 0; background: #f1f3f4; border: 1px solid #dadce0; border-radius: 4px; text-decoration: none; color: #202124; font-weight: 600; text-align: left; transition: all 0.15s ease; }
+    .btn { display: block; padding: 10px 15px; margin: 10px 0; background: #f1f3f4; border: 1px solid #dadce0; border-radius: 4px; text-decoration: none; color: #202124; font-weight: 600; text-align: left; }
     .btn:hover { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
     .btn span { display: block; font-size: 11px; font-weight: normal; color: #70757a; }
+    input[type="password"] { width: 100%; padding: 8px; box-sizing: border-box; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
+    button.login-btn { background: #1a73e8; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: 600; }
   </style>
 </head>
 <body>
   <div class="card">
-    <h2>Scripts para ServiceDesk Plus</h2>
-    <p>Asegúrate de tener Tampermonkey instalado. Haz clic en cada uno para instalarlo:</p>
+    <div id="login-box">
+      <h2>Acceso Restringido</h2>
+      <p>Introduce la clave del equipo para acceder a los instaladores:</p>
+      <input type="password" id="passInput" placeholder="Contraseña">
+      <button class="login-btn" onclick="verificar()">Entrar</button>
+      <p id="errorMsg" style="color: red; display: none;">Contraseña incorrecta</p>
+    </div>
 
-    <a class="btn" href="servicedesk-cabecera.user.js">1. Añadir cabecera a la descripción <span>Inserta automáticamente fecha y técnico</span></a>
-    <a class="btn" href="servicedesk-botones-campos.user.js">2. Botones Rápidos de Campos <span>Atajos para Estado, Grupo, Tipo, etc.</span></a>
-    <a class="btn" href="servicedesk-cerrar-rechazar.user.js">3. Cerrar / Rechazar / Remitente <span>Cierre rápido y extracción de correo</span></a>
-    <a class="btn" href="servicedesk-plantillas.user.js">4. Plantillas para tickets <span>Desplegable Select2 con ajustes rápidos</span></a>
-    <a class="btn" href="vozitel-copiar-correo.user.js">5. Vozitel a ServiceDesk <span>Copia correos con imágenes adaptadas</span></a>
+    <div id="scripts-box" style="display: none;">
+      <h2>Scripts para ServiceDesk Plus</h2>
+      <p>Haz clic en cada uno para instalarlo en Tampermonkey:</p>
+      <a class="btn" href="servicedesk-cabecera.user.js">1. Cabecera en descripción <span>Inserta fecha y técnico</span></a>
+      <a class="btn" href="servicedesk-botones-campos.user.js">2. Botones Rápidos de Campos <span>Atajos Estado, Grupo, etc.</span></a>
+      <a class="btn" href="servicedesk-cerrar-rechazar.user.js">3. Cerrar / Rechazar / Remitente <span>Cierre y remitente rápido</span></a>
+      <a class="btn" href="servicedesk-plantillas.user.js">4. Plantillas para tickets <span>Desplegable Select2</span></a>
+      <a class="btn" href="vozitel-copiar-correo.user.js">5. Vozitel a ServiceDesk <span>Copiar correos</span></a>
+    </div>
   </div>
+
+  <script>
+    const CLAVE_CORRECTA = "XCINFA";
+
+    function verificar() {
+      const input = document.getElementById('passInput').value;
+      if (input === CLAVE_CORRECTA) {
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('scripts-box').style.display = 'block';
+      } else {
+        document.getElementById('errorMsg').style.display = 'block';
+      }
+    }
+  </script>
 </body>
 </html>
