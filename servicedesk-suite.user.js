@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.3
+// @version      2.4
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -934,141 +934,532 @@
     // 7. MÓDULO: PLANTILLAS DE TICKET
     // =========================================================================
     const MIS_PRESETS = [
+        /*
+        // ---------------------------------------------------------------------
+        // 📌 PLANTILLA DE EJEMPLO (Guía con todos los campos configurables)
+        // Puedes duplicar este bloque y descomentarlo para crear una plantilla:
+        // ---------------------------------------------------------------------
+        {
+            nombre: "✨ Nombre de la Plantilla",
+            obtenerDatos: () => ({
+                solicitante:   'correo.ejemplo@cinfa.com', // Busca por email o nombre
+                grupo:         'Administrativa',           // udf_fields.udf_pick_2720
+                subgrupo:      'Usuario',                  // udf_fields.udf_pick_2722
+                elemento:      'Alta',                     // udf_fields.udf_pick_2723
+                grupoAsignado: 'Front Office',             // udf_fields.udf_pick_2726
+                tecnico:       TECNICO_DEFECTO,            // Nombre exacto del técnico
+                tipoTicket:    'Petición',                 // udf_fields.udf_pick_2719
+                viaTicket:     'Correo electrónico',       // udf_fields.udf_pick_2724
+                ubicacion:     'Olloki',                   // udf_fields.udf_pick_2725
+                proveedor:     '',                         // udf_fields.udf_pick_2703 (opcional)
+                estado:        'Abierto',                  // status (opcional)
+                asunto:        'Asunto del ticket - ',
+                descripcion:   `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
+        },
+        */
         {
             nombre: "✅ Alta Eduardo Infante",
-            obtenerDatos: () => ({ solicitante: 'eduardo.infante@cinfa.com', grupo: 'Administrativa', subgrupo: 'Usuario', elemento: 'Alta', grupoAsignado: 'Front Office', tipoTicket: 'Petición', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Usuario - Alta - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                solicitante: 'eduardo.infante@cinfa.com',
+                grupo: 'Administrativa',
+                subgrupo: 'Usuario',
+                elemento: 'Alta',
+                grupoAsignado: 'Front Office',
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Usuario - Alta - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "✅ Alta Laura Moreno",
-            obtenerDatos: () => ({ solicitante: 'lmoreno@cinfa.com', grupo: 'Administrativa', subgrupo: 'Usuario', elemento: 'Alta', grupoAsignado: 'Front Office', tipoTicket: 'Petición', viaTicket: 'Correo electrónico', ubicacion: 'Areta', asunto: 'Usuario - Alta - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                solicitante: 'lmoreno@cinfa.com',
+                grupo: 'Administrativa',
+                subgrupo: 'Usuario',
+                elemento: 'Alta',
+                grupoAsignado: 'Front Office',
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Areta',
+                asunto: 'Usuario - Alta - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "✅ Alta Itziar Sánchez",
-            obtenerDatos: () => ({ solicitante: 'isanchez@cinfa.com', grupo: 'Administrativa', subgrupo: 'Usuario', elemento: 'Alta', grupoAsignado: 'Front Office', tipoTicket: 'Petición', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Usuario - Alta - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                solicitante: 'isanchez@cinfa.com',
+                grupo: 'Administrativa',
+                subgrupo: 'Usuario',
+                elemento: 'Alta',
+                grupoAsignado: 'Front Office',
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Usuario - Alta - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🪑 Salas",
-            obtenerDatos: () => ({ grupo: 'Administrativa', subgrupo: 'Salas/Equipamiento Prest', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Sala {{Nombre de la sala}} - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Administrativa',
+                subgrupo: 'Salas/Equipamiento Prest',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Sala {{Nombre de la sala}} - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "❌ Baja",
-            obtenerDatos: () => ({ grupo: 'Administrativa', subgrupo: 'Usuario', elemento: 'Baja', grupoAsignado: 'Front Office', tipoTicket: 'Petición', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Usuario - Baja - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Administrativa',
+                subgrupo: 'Usuario',
+                elemento: 'Baja',
+                grupoAsignado: 'Front Office',
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Usuario - Baja - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "📩 Correo de SAP",
-            obtenerDatos: () => ({ grupo: 'Aplicaciones corporativas', subgrupo: 'SAP', elemento: 'Funcionamiento', grupoAsignado: 'Aplicaciones', tipoTicket: 'Incidencia', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'SAP - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Aplicaciones corporativas',
+                subgrupo: 'SAP',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Aplicaciones',
+                tipoTicket: 'Incidencia',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'SAP - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "📩 Correo de GII",
-            obtenerDatos: () => ({ grupo: 'Aplicaciones corporativas', subgrupo: 'GII/Comer', elemento: 'Funcionamiento', grupoAsignado: 'Aplicaciones', tipoTicket: 'Incidencia', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'GII - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Aplicaciones corporativas',
+                subgrupo: 'GII/Comer',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Aplicaciones',
+                tipoTicket: 'Incidencia',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'GII - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "📺 VDI",
-            obtenerDatos: () => ({ grupo: 'Aplicaciones citrix', subgrupo: 'Escritorios virtuales', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Incidencia', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'VDI - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Aplicaciones citrix',
+                subgrupo: 'Escritorios virtuales',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Incidencia',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'VDI - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🍋‍🟩 Aplicaciones publicadas",
-            obtenerDatos: () => ({ grupo: 'Aplicaciones citrix', subgrupo: 'Aplicaciones publicadas', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Incidencia', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: '{Nombre de la aplicación} - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Aplicaciones citrix',
+                subgrupo: 'Aplicaciones publicadas',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Incidencia',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: '{Nombre de la aplicación} - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🍋 Cliente Citrix",
-            obtenerDatos: () => ({ grupo: 'Aplicaciones citrix', subgrupo: 'Cliente Citrix', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Incidencia', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Citrix - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Aplicaciones citrix',
+                subgrupo: 'Cliente Citrix',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Incidencia',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Citrix - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "☢️ Líder NEO",
-            obtenerDatos: () => ({ solicitante: 'lider.neo@cinfa.com', grupo: 'Aplicaciones corporativas', subgrupo: 'NEO', elemento: 'Funcionamiento', grupoAsignado: 'Aplicaciones Neo', tecnico: 'Soporte Neo', tipoTicket: 'Incidencia', viaTicket: 'Correo electrónico', ubicacion: 'NEO', asunto: 'NEO - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                solicitante: 'lider.neo@cinfa.com',
+                grupo: 'Aplicaciones corporativas',
+                subgrupo: 'NEO',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Aplicaciones Neo',
+                tecnico: 'Soporte Neo',
+                tipoTicket: 'Incidencia',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'NEO',
+                asunto: 'NEO - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "💻 Hardware (portátil)",
-            obtenerDatos: () => ({ grupo: 'Hardware', subgrupo: 'Portatil', elemento: 'Configuracion', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Portatil - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Hardware',
+                subgrupo: 'Portatil',
+                elemento: 'Configuracion',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Portatil - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🖨️ Hardware (impresora)",
-            obtenerDatos: () => ({ grupo: 'Hardware', subgrupo: 'Impresora', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Impresora - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Hardware',
+                subgrupo: 'Impresora',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Impresora - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🖨️ Hardware (etiquetadora)",
-            obtenerDatos: () => ({ grupo: 'Hardware', subgrupo: 'Etiquetadora', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Etiquetadora - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Hardware',
+                subgrupo: 'Etiquetadora',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Etiquetadora - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "⚒️ Hardware (accesorios)",
-            obtenerDatos: () => ({ grupo: 'Hardware', subgrupo: 'Accesorios (material)', elemento: 'Configuracion', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Accesorios - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Hardware',
+                subgrupo: 'Accesorios (material)',
+                elemento: 'Configuracion',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Accesorios - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "📺 Hardware (pantalla)",
-            obtenerDatos: () => ({ grupo: 'Hardware', subgrupo: 'Pantalla', elemento: 'Configuracion', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Pantalla - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Hardware',
+                subgrupo: 'Pantalla',
+                elemento: 'Configuracion',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Pantalla - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "⚒️ Hardware (servidores)",
-            obtenerDatos: () => ({ grupo: 'Hardware', subgrupo: 'Servidores', elemento: 'Configuracion', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Servidor - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Hardware',
+                subgrupo: 'Servidores',
+                elemento: 'Configuracion',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Servidor - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "💁 Delegado (portátil delegado)",
-            obtenerDatos: () => ({ grupo: 'Hardware', subgrupo: 'Portatil delegados', elemento: 'Configuracion', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Portatil delegado - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Hardware',
+                subgrupo: 'Portatil delegados',
+                elemento: 'Configuracion',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Portatil delegado - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "😭 Recuperación de datos",
-            obtenerDatos: () => ({ grupo: 'Monitorización', subgrupo: 'Backup/restore', elemento: 'Recuperacion datos', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Petición', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Backup - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Monitorización',
+                subgrupo: 'Backup/restore',
+                elemento: 'Recuperacion datos',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Backup - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "©️ Docuware (eliminar contrato)",
-            obtenerDatos: () => ({ grupo: 'Aplicaciones corporativas', subgrupo: 'Docuware web', elemento: 'Eliminacion contratos', grupoAsignado: 'Aplicaciones', tipoTicket: 'Petición', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Docuware - Eliminar contrato', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Aplicaciones corporativas',
+                subgrupo: 'Docuware web',
+                elemento: 'Eliminacion contratos',
+                grupoAsignado: 'Aplicaciones',
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Docuware - Eliminar contrato',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "©️ Docuware (estado de firmas)",
-            obtenerDatos: () => ({ grupo: 'Aplicaciones corporativas', subgrupo: 'Docuware web', elemento: 'Estados de firma', grupoAsignado: 'Aplicaciones', tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Docuware - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Aplicaciones corporativas',
+                subgrupo: 'Docuware web',
+                elemento: 'Estados de firma',
+                grupoAsignado: 'Aplicaciones',
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Docuware - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🛜 LAN/WAN",
-            obtenerDatos: () => ({ grupo: 'Comunicaciones', subgrupo: 'LAN/WAN', elemento: 'Configuracion-NAC', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Red - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Comunicaciones',
+                subgrupo: 'LAN/WAN',
+                elemento: 'Configuracion-NAC',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Red - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🛜 Parchear tomas de red",
-            obtenerDatos: () => ({ grupo: 'Comunicaciones', subgrupo: 'LAN/WAN', elemento: 'Instalacion-parcheado tomas', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Petición', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Red - Parchear tomas', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Comunicaciones',
+                subgrupo: 'LAN/WAN',
+                elemento: 'Instalacion-parcheado tomas',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Red - Parchear tomas',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "📱 Móviles (general)",
-            obtenerDatos: () => ({ grupo: 'Comunicaciones', subgrupo: 'Telefonia', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Movil - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Comunicaciones',
+                subgrupo: 'Telefonia',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Movil - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "📱 Móviles (roaming)",
-            obtenerDatos: () => ({ grupo: 'Comunicaciones', subgrupo: 'Telefonia', elemento: 'Roaming', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Petición', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Movil - Solicitud de Roaming', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Comunicaciones',
+                subgrupo: 'Telefonia',
+                elemento: 'Roaming',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Movil - Solicitud de Roaming',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🈲 VPN (general)",
-            obtenerDatos: () => ({ grupo: 'Comunicaciones', subgrupo: 'VPN', elemento: 'Funcionamiento', grupoAsignado: 'Aplicaciones', tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'VPN - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Comunicaciones',
+                subgrupo: 'VPN',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Aplicaciones',
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'VPN - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🈲 VPN (alta de usuarios)",
-            obtenerDatos: () => ({ grupo: 'Comunicaciones', subgrupo: 'VPN', elemento: 'Gestion usuarios', grupoAsignado: 'Aplicaciones', tipoTicket: 'Petición', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'VPN - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Comunicaciones',
+                subgrupo: 'VPN',
+                elemento: 'Gestion usuarios',
+                grupoAsignado: 'Aplicaciones',
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'VPN - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🅰️ Software (Adobe)",
-            obtenerDatos: () => ({ grupo: 'Software', subgrupo: 'Adobe pro', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Adobe - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Software',
+                subgrupo: 'Adobe pro',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Adobe - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "♿ Software (navegadores)",
-            obtenerDatos: () => ({ grupo: 'Software', subgrupo: 'Navegadores chrome y edge', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Chrome - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Software',
+                subgrupo: 'Navegadores chrome y edge',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Chrome - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "♿ Software (Office)",
-            obtenerDatos: () => ({ grupo: 'Software', subgrupo: 'Office M365', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Office - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Software',
+                subgrupo: 'Office M365',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Office - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🚮 Software (Contraseña de Windows)",
-            obtenerDatos: () => ({ grupo: 'Software', subgrupo: 'Sistema Operativo', elemento: 'Usuario/contraseña', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Petición', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Windows - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Software',
+                subgrupo: 'Sistema Operativo',
+                elemento: 'Usuario/contraseña',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Windows - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "👨‍🦽‍➡️ Software (Windows)",
-            obtenerDatos: () => ({ grupo: 'Software', subgrupo: 'Sistema Operativo', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Windows - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Software',
+                subgrupo: 'Sistema Operativo',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Windows - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🥽 Software (ofimática general)",
-            obtenerDatos: () => ({ grupo: 'Software', subgrupo: 'Ofimatica general', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: '{{Nombre del programa}} - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Software',
+                subgrupo: 'Ofimatica general',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: '{{Nombre del programa}} - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         },
         {
             nombre: "🥽 Software (webs corporativas y certificados)",
-            obtenerDatos: () => ({ grupo: 'Software', subgrupo: 'Webs corp. y certificados', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: '{{Nombre del de la web}} - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({
+                grupo: 'Software',
+                subgrupo: 'Webs corp. y certificados',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: '{{Nombre del de la web}} - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
         }
     ];
 
