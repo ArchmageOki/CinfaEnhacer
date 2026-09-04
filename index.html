@@ -183,6 +183,13 @@
             stroke-linejoin: round;
         }
 
+        .prerequisite-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
         .btn-tampermonkey {
             display: inline-flex;
             align-items: center;
@@ -190,7 +197,7 @@
             background: var(--surface-card);
             border: 1px solid var(--notice-border);
             color: var(--text-main);
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 6px;
             font-size: 0.85rem;
             font-weight: 600;
@@ -202,6 +209,12 @@
         .btn-tampermonkey:hover {
             background: var(--surface-hover);
             border-color: var(--border-hover);
+        }
+
+        .btn-tampermonkey svg.browser-icon {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
         }
 
         .grid {
@@ -391,6 +404,10 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+            .prerequisite-actions {
+                width: 100%;
+                flex-direction: column;
+            }
             .btn-tampermonkey {
                 width: 100%;
                 justify-content: center;
@@ -425,7 +442,7 @@
         </nav>
         
         <header>
-            <h1>CinfaEnhancer</h1>
+            <h1>CinfaEnhancer - Juanma Garrido</h1>
             <p class="subtitle">Ecosistema de scripts optimizados para el flujo operativo diario en ServiceDesk Plus y Vozitel.</p>
         </header>
 
@@ -434,10 +451,24 @@
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                 <span>Requisito previo: Necesitas tener instalada la extensión <strong>Tampermonkey</strong> para ejecutar estos scripts.</span>
             </div>
-            <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener noreferrer" class="btn-tampermonkey">
-                <span>Descargar Tampermonkey</span>
-                <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-            </a>
+            <div class="prerequisite-actions">
+                <a href="https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank" rel="noopener noreferrer" class="btn-tampermonkey">
+                    <svg class="browser-icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="4.5" fill="#4285F4"/>
+                        <circle cx="12" cy="12" r="9" fill="none" stroke="#EA4335" stroke-width="3" stroke-dasharray="19 38" stroke-dashoffset="0"/>
+                        <circle cx="12" cy="12" r="9" fill="none" stroke="#FBBC05" stroke-width="3" stroke-dasharray="19 38" stroke-dashoffset="-19"/>
+                        <circle cx="12" cy="12" r="9" fill="none" stroke="#34A853" stroke-width="3" stroke-dasharray="19 38" stroke-dashoffset="-38"/>
+                    </svg>
+                    <span>Chrome</span>
+                </a>
+                <a href="https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd" target="_blank" rel="noopener noreferrer" class="btn-tampermonkey">
+                    <svg class="browser-icon" viewBox="0 0 24 24" fill="none">
+                        <path d="M20.5 14.5C19.8 18.2 16.5 21 12.5 21C7.8 21 4 17.2 4 12.5C4 7.8 7.8 4 12.5 4C14.2 4 15.7 4.5 17 5.4C15.8 5.8 14.5 6.7 13.8 8C13.2 9.2 13.3 10.5 13.7 11.5C11.5 11.5 9.8 13.2 9.8 15.3C9.8 17.4 11.5 19.1 13.6 19.1C16.8 19.1 19.4 17.2 20.5 14.5Z" fill="#0078D7"/>
+                        <path d="M12.5 4C16.2 4 19.3 6.4 20.4 9.8C18.6 9.2 16.4 9.6 15 10.8C14.2 9.7 13.8 8.4 14.2 7C13.7 5.2 13.2 4.4 12.5 4Z" fill="#00C7C4"/>
+                    </svg>
+                    <span>Edge</span>
+                </a>
+            </div>
         </section>
 
         <main class="grid">
