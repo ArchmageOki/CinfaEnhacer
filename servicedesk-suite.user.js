@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.4
+// @version      2.5
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -1593,15 +1593,15 @@
             obtenerTexto: () => `Para cambiar tu contraseña debes acceder a TIM desde el siguiente enlace<br><br>
             http://virtualpassword.cinfa.com/Tim/Index<br><br>
             Deberás iniciar sesión con el número de tu tarjeta blanca de Cinfa y tu DNI con la letra mayúscula.<br>
-            Dentro de TIM tienes las siguientes opciones:<br>
-            -Windows: para cambiar tu contraseña de Windows, Gmail y acceso al escritorio virtual<br>
-            -GII<br>
-            -SAP<br>
-            -Intranet: para cambiar tu contraseña de la intranet de aplicaciones (la del fondo morado)<br><br>
+            Dentro de TIM tienes las siguientes opciones:<br><br>
+                -Windows: para cambiar tu contraseña de Windows, Gmail y acceso al escritorio virtual<br>
+                -GII<br>
+                -SAP<br>
+                -Intranet: para cambiar tu contraseña de la intranet de aplicaciones (la del fondo morado)<br><br>
             La contraseña de Windows e Intranet debe cumplir los siguientes requisitos:<br><br>
-            -Al menos 12 caracteres<br>
-            -Al menos: 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial. No admite algunos caracteres como ñ, ¡, ¿ o letras acentuadas<br>
-            -No puede contener tu nombre o apellidos, tampoco palabras comunes completas<br><br>
+                -Al menos 12 caracteres<br>
+                -Al menos: 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial. No admite algunos caracteres como ñ, ¡, ¿ o letras acentuadas<br>
+                -No puede contener tu nombre o apellidos, tampoco palabras comunes completas<br><br>
             La contraseña de GII y SAP debe tener entre 8 y 12 caracteres de longitud y no tiene los requisitos anteriores.`
         },
         {
