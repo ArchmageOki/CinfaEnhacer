@@ -5,8 +5,8 @@
 // @description  Selector Select2 con buscador integrado en la barra de herramientas del editor de resolución
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
-// @updateURL    https://archmageoki.github.io/CinfaEnhacer/servicedesk-resoluciones.user.js
-// @downloadURL  https://archmageoki.github.io/CinfaEnhacer/servicedesk-resoluciones.user.js
+// @updateURL    https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-resoluciones.user.js
+// @downloadURL  https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-resoluciones.user.js
 // @grant        GM_registerMenuCommand
 // @grant        unsafeWindow
 // @run-at       document-start
