@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ServiceDesk - Plantillas para tickets
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Selector de plantillas idéntico a Select2 nativo con detección reactiva continua (SPA compatible)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -16,9 +16,34 @@
     'use strict';
 
     // =========================================================================
-    // ⚙️ CONFIGURACIÓN GLOBAL (Modificar aquí si cambia el técnico)
+    // ⚙️ GESTIÓN COMPARTIDA DE TÉCNICO (Persistente y compartida entre scripts)
     // =========================================================================
-    const TECNICO_DEFECTO = 'Juanma';
+    function obtenerNombreTecnico() {
+        let nombre = localStorage.getItem('sdp_tecnico_nombre');
+        while (!nombre || !nombre.trim()) {
+            nombre = prompt('⚙️ Configuración ServiceDesk:\nIntroduce tu nombre de técnico (tal como aparece en SDP):', 'Juanma');
+            if (nombre && nombre.trim()) {
+                localStorage.setItem('sdp_tecnico_nombre', nombre.trim());
+            } else {
+                alert('El nombre de técnico es obligatorio para las funciones automáticas.');
+            }
+        }
+        return localStorage.getItem('sdp_tecnico_nombre');
+    }
+
+    if (typeof GM_registerMenuCommand === 'function') {
+        GM_registerMenuCommand('✏️ Configurar nombre de Técnico', () => {
+            const actual = localStorage.getItem('sdp_tecnico_nombre') || '';
+            const nuevo = prompt('Introduce tu nuevo nombre de técnico:', actual);
+            if (nuevo && nuevo.trim()) {
+                localStorage.setItem('sdp_tecnico_nombre', nuevo.trim());
+                alert(`Nombre actualizado a: ${nuevo.trim()}.\nSe recargará la página para aplicar los cambios.`);
+                location.reload();
+            }
+        });
+    }
+
+    const TECNICO_DEFECTO = obtenerNombreTecnico();
 
     function esModoValido() {
         const url = window.location.href;
@@ -439,7 +464,7 @@
     }
 
     // =========================================================================
-    // 🎛️ DEFINICIÓN DE TUS PRESETS
+    // 🎛️ DEFINICIÓN DE PRESETS
     // =========================================================================
     const MIS_PRESETS = [
         {
@@ -1054,7 +1079,6 @@
         requesterRightCol.appendChild(wrapper);
     }
 
-    // Observador reactivo puro sobre el DOM (sin timeouts fijos que expiren)
     const observer = new MutationObserver(() => {
         inyectarSelect2Plantillas();
     });
@@ -1064,7 +1088,6 @@
         subtree: true
     });
 
-    // Intercepción para navegación interna SPA
     const win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
     const reaccionarRuta = () => requestAnimationFrame(inyectarSelect2Plantillas);
 
