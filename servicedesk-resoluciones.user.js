@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ServiceDesk - Plantillas de Resolución
 // @namespace    http://tampermonkey.net/
-// @version      1.4
+// @version      1.5
 // @description  Selector Select2 perfectamente alineado en la barra de herramientas del editor Ze
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
