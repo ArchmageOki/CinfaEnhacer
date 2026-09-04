@@ -5,6 +5,8 @@
 // @description  Inyección reactiva pura del botón de cabecera bajo Descripción tanto en edición como en creación de tickets
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
+// @updateURL    https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-cabecera.user.js
+// @downloadURL  https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-cabecera.user.js
 // @grant        unsafeWindow
 // @run-at       document-start
 // ==/UserScript==
