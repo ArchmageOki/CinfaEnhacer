@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.1
+// @version      2.2
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -1060,7 +1060,7 @@
         },
         {
             nombre: "👨‍🦽‍➡️ Software (Windows)",
-            obtenerDatos: () => ({ grupo: 'Software', subgrupo: 'Sistema Operativo', elemento: 'Usuario/contraseña', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Windows - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
+            obtenerDatos: () => ({ grupo: 'Software', subgrupo: 'Sistema Operativo', elemento: 'Funcionamiento', grupoAsignado: 'Front Office', tecnico: TECNICO_DEFECTO, tipoTicket: 'Consulta', viaTicket: 'Correo electrónico', ubicacion: 'Olloki', asunto: 'Windows - ', descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>` })
         },
         {
             nombre: "🥽 Software (ofimática general)",
