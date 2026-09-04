@@ -22,6 +22,28 @@
             --text-secondary: #94a3b8;
             --badge-bg: rgba(59, 130, 246, 0.1);
             --badge-border: rgba(59, 130, 246, 0.25);
+            --notice-bg: #131d31;
+            --notice-border: #223559;
+            --notice-text: #bfdbfe;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --surface-card: #ffffff;
+            --surface-hover: #f1f5f9;
+            --primary: #2563eb;
+            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            --accent-vozitel: #059669;
+            --accent-vozitel-gradient: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            --border-color: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --text-main: #0f172a;
+            --text-secondary: #64748b;
+            --badge-bg: rgba(37, 99, 235, 0.08);
+            --badge-border: rgba(37, 99, 235, 0.2);
+            --notice-bg: #eff6ff;
+            --notice-border: #bfdbfe;
+            --notice-text: #1e40af;
         }
 
         * {
@@ -41,6 +63,7 @@
             padding: 3rem 1.5rem;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
 
         .container {
@@ -48,9 +71,11 @@
             max-width: 860px;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
         }
 
         .badge-system {
@@ -63,18 +88,54 @@
             border-radius: 9999px;
             font-size: 0.8rem;
             font-weight: 600;
-            color: #60a5fa;
+            color: var(--primary);
             letter-spacing: 0.03em;
             text-transform: uppercase;
-            margin-bottom: 1.25rem;
         }
 
         .badge-dot {
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background-color: #3b82f6;
-            box-shadow: 0 0 8px #3b82f6;
+            background-color: var(--primary);
+            box-shadow: 0 0 8px var(--primary);
+        }
+
+        .theme-toggle-btn {
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            color: var(--text-main);
+            border-color: var(--border-hover);
+            background: var(--surface-hover);
+        }
+
+        .theme-toggle-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
         h1 {
@@ -82,9 +143,6 @@
             font-weight: 700;
             letter-spacing: -0.03em;
             margin-bottom: 0.75rem;
-            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         p.subtitle {
@@ -92,6 +150,58 @@
             color: var(--text-secondary);
             max-width: 540px;
             margin: 0 auto;
+        }
+
+        .prerequisite-banner {
+            background-color: var(--notice-bg);
+            border: 1px solid var(--notice-border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .prerequisite-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--notice-text);
+            font-size: 0.9rem;
+        }
+
+        .prerequisite-info svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .btn-tampermonkey {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface-card);
+            border: 1px solid var(--notice-border);
+            color: var(--text-main);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+
+        .btn-tampermonkey:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-hover);
         }
 
         .grid {
@@ -127,17 +237,17 @@
         }
 
         .card-sdp {
-            --card-accent: #3b82f6;
+            --card-accent: var(--primary);
         }
 
         .card-vozitel {
-            --card-accent: #10b981;
+            --card-accent: var(--accent-vozitel);
         }
 
         .card:hover {
             transform: translateY(-2px);
             border-color: var(--border-hover);
-            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.15);
         }
 
         .card-header {
@@ -166,21 +276,21 @@
             font-size: 0.75rem;
             color: var(--text-secondary);
             font-family: monospace;
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(125, 125, 125, 0.08);
             padding: 2px 8px;
             border-radius: 4px;
             width: fit-content;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(125, 125, 125, 0.15);
         }
 
         .card-version {
             font-size: 0.8rem;
             font-weight: 600;
-            color: #94a3b8;
-            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            background: rgba(125, 125, 125, 0.08);
             padding: 4px 8px;
             border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(125, 125, 125, 0.15);
         }
 
         .features-list {
@@ -206,7 +316,7 @@
         }
 
         .features-list strong {
-            color: #e2e8f0;
+            color: var(--text-main);
             font-weight: 600;
         }
 
@@ -260,35 +370,34 @@
             justify-content: space-between;
             gap: 1rem;
             font-size: 0.85rem;
-            color: #64748b;
-        }
-
-        .footer-note {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            color: var(--text-secondary);
         }
 
         .footer-links a {
-            color: #94a3b8;
+            color: var(--text-secondary);
             text-decoration: none;
             transition: color 0.15s ease;
         }
 
         .footer-links a:hover {
-            color: #f1f5f9;
+            color: var(--text-main);
         }
 
         @media (max-width: 640px) {
             h1 {
                 font-size: 2rem;
             }
-            .card-header {
+            .prerequisite-banner {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            .card-version {
-                align-self: flex-start;
+            .btn-tampermonkey {
+                width: 100%;
+                justify-content: center;
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
             footer {
                 flex-direction: column;
@@ -301,19 +410,38 @@
 <body>
 
     <div class="container">
-        
-        <header>
+
+        <nav class="top-nav">
             <div class="badge-system">
                 <span class="badge-dot"></span>
                 <span>Tampermonkey Workspace</span>
             </div>
+
+            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Cambiar modo de tema">
+                <svg id="theme-icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg id="theme-icon-sun" style="display: none;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <span id="theme-text">Modo Claro</span>
+            </button>
+        </nav>
+        
+        <header>
             <h1>CinfaEnhancer</h1>
             <p class="subtitle">Ecosistema de scripts optimizados para el flujo operativo diario en ServiceDesk Plus y Vozitel.</p>
         </header>
 
+        <section class="prerequisite-banner">
+            <div class="prerequisite-info">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <span>Requisito previo: Necesitas tener instalada la extensión <strong>Tampermonkey</strong> para ejecutar estos scripts.</span>
+            </div>
+            <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener noreferrer" class="btn-tampermonkey">
+                <span>Descargar Tampermonkey</span>
+                <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+        </section>
+
         <main class="grid">
 
-            <!-- Card 1: ServiceDesk Suite -->
             <article class="card card-sdp">
                 <div>
                     <div class="card-header">
@@ -338,7 +466,6 @@
                 </a>
             </article>
 
-            <!-- Card 2: Vozitel Bridge -->
             <article class="card card-vozitel">
                 <div>
                     <div class="card-header">
@@ -359,16 +486,14 @@
 
                 <a href="vozitel-copiar-correo.user.js" class="btn-install btn-install-vozitel">
                     <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    <span>Instalar Vozitel Bridge</span>
+                    <span>Instalar Vozitel Integration</span>
                 </a>
             </article>
 
         </main>
 
         <footer>
-            <div class="footer-note">
-                <span>Requisito previo: Extensión <strong>Tampermonkey</strong> activa en el navegador.</span>
-            </div>
+            <span>CinfaEnhancer · Despliegue continuo con GitHub Pages</span>
             <div class="footer-links">
                 <a href="https://github.com/ArchmageOki/CinfaEnhacer" target="_blank" rel="noopener noreferrer">Repositorio en GitHub</a>
             </div>
@@ -376,5 +501,37 @@
 
     </div>
 
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle');
+        const iconMoon = document.getElementById('theme-icon-moon');
+        const iconSun = document.getElementById('theme-icon-sun');
+        const textTheme = document.getElementById('theme-text');
+
+        function setTheme(theme) {
+            if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                iconMoon.style.display = 'none';
+                iconSun.style.display = 'block';
+                textTheme.textContent = 'Modo Oscuro';
+                localStorage.setItem('cinfa_theme', 'light');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                iconMoon.style.display = 'block';
+                iconSun.style.display = 'none';
+                textTheme.textContent = 'Modo Claro';
+                localStorage.setItem('cinfa_theme', 'dark');
+            }
+        }
+
+        const savedTheme = localStorage.getItem('cinfa_theme') || 
+            (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        
+        setTheme(savedTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            setTheme(currentTheme === 'light' ? 'dark' : 'light');
+        });
+    </script>
 </body>
 </html>
