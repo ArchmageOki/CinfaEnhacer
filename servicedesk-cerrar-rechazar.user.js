@@ -269,37 +269,47 @@
     }
 
     async function abrirResolucionYEnfocarInicio() {
-        const heading = document.querySelector('z-cpheading.zcollapsiblepanel__heading');
-        const panelContenedor = heading ? heading.closest('z-collapsiblepanel, .zcollapsiblepanel') || heading.parentElement : null;
+        const panel = document.getElementById('rfres-panel1-zc') || document.querySelector('z-collapsiblepanel.widget-table');
+        const contentBox = document.getElementById('rf-resolutionBox');
 
-        const estaCerrado = panelContenedor ? (panelContenedor.classList.contains('is-collapsed') || !panelContenedor.classList.contains('is-expanded')) : true;
+        // Determinar si está realmente cerrado
+        const estaCerradoPorAttr = panel && panel.getAttribute('aria-expanded') === 'false';
+        const estaCerradoPorEstilo = contentBox && (contentBox.style.display === 'none' || getComputedStyle(contentBox).display === 'none');
 
-        if (heading && estaCerrado) {
-            const toggleDiv = heading.querySelector('.p10') || heading;
-            toggleDiv.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-            await wait(220);
+        // Solo hacer clic para abrir si efectivamente está cerrado
+        if (estaCerradoPorAttr || estaCerradoPorEstilo) {
+            const heading = document.querySelector('z-cpheading.zcollapsiblepanel__heading') || (panel ? panel.querySelector('.zcollapsiblepanel__header') : null);
+            if (heading) {
+                const toggleBtn = heading.querySelector('.p10') || heading;
+                toggleBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                await wait(250);
+            }
         }
 
+        // Enfocar el editor de texto dentro del iframe de resolución
         const iframes = Array.from(document.querySelectorAll('iframe'));
         for (let i = iframes.length - 1; i >= 0; i--) {
             const f = iframes[i];
             try {
                 const doc = f.contentDocument || (f.contentWindow && f.contentWindow.document);
                 if (doc && doc.body && (doc.body.classList.contains('ze_body') || doc.body.getAttribute('contenteditable') === 'true')) {
-                    f.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    f.contentWindow.focus();
-                    doc.body.focus();
+                    // Verificar que el iframe pertenezca a la caja de resolución
+                    if (f.closest('#rf-resolutionBox') || f.closest('z-cpcontent')) {
+                        f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        f.contentWindow.focus();
+                        doc.body.focus();
 
-                    const win = f.contentWindow;
-                    const sel = win.getSelection();
-                    if (sel) {
-                        const range = doc.createRange();
-                        range.setStart(doc.body, 0);
-                        range.collapse(true);
-                        sel.removeAllRanges();
-                        sel.addRange(range);
+                        const win = f.contentWindow;
+                        const sel = win.getSelection();
+                        if (sel) {
+                            const range = doc.createRange();
+                            range.setStart(doc.body, 0);
+                            range.collapse(true);
+                            sel.removeAllRanges();
+                            sel.addRange(range);
+                        }
+                        return true;
                     }
-                    return true;
                 }
             } catch (e) {}
         }
