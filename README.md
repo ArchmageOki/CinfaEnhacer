@@ -51,6 +51,11 @@ Para instalar o actualizar los scripts, accede al portal web del proyecto:
   * Rastrea y recupera imágenes embebidas en Base64 (incluso dentro de iframes).
   * Normaliza y formatea las líneas de *Remitente* y *Destinatario* adaptándolas a la sintaxis esperada por ServiceDesk (`Remitente: Nombre <email>`).
   * Reconstruye el árbol HTML reparando imágenes rotas o perdidas y copia el contenido al portapapeles en formato enriquecido (`text/html`) y texto plano.
+ 
+### 6. `servicedesk-resoluciones.user.js`
+* **Nombre:** ServiceDesk - Plantillas para resoluciones
+* **Entorno:** ServicDesk
+* **Acción:** Integra un selector desplegable de resoluciones dentro del cajón homónimo. Permite seleccionar entre las plantillas que se han configurado.
 
 ---
 
