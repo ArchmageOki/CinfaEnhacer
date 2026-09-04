@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ServiceDesk - Plantillas de Resolución
 // @namespace    http://tampermonkey.net/
-// @version      1.7
+// @version      1.8
 // @description  Selector Select2 perfectamente alineado en la barra de herramientas del editor Ze
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -314,7 +314,7 @@
     }
     
     // =========================================================================
-    // 🛠️ PORTAL FLOTANTE ROBUSTO
+    // 🛠️ PORTAL FLOTANTE ROBUSTO (Sin conflicto de clics ni arrastre)
     // =========================================================================
     let portalDrop = null;
     let portalInput = null;
@@ -344,23 +344,29 @@
             li.innerText = resItem.titulo;
             li.title = resItem.titulo;
 
-            li.addEventListener('mousedown', async (e) => {
+            // Evitar que el texto se vuelva arrastrable (icono fantasma de tu captura)
+            li.setAttribute('draggable', 'false');
+            li.addEventListener('dragstart', (e) => e.preventDefault());
+
+            // Click directo y garantizado
+            li.addEventListener('click', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
+                const btn = activeChoiceBtn;
                 cerrarPortal();
 
-                if (activeChoiceBtn) {
-                    const chosenSpan = activeChoiceBtn.querySelector('.sdp-res-chosen');
-                    chosenSpan.innerText = '⏳ Aplicando...';
+                if (btn) {
+                    const chosenSpan = btn.querySelector('.sdp-res-chosen');
+                    if (chosenSpan) chosenSpan.innerText = '⏳ Aplicando...';
 
                     await sobrescribirResolucion(resItem.obtenerTexto());
 
-                    activeChoiceBtn.classList.add('is-done');
-                    chosenSpan.innerText = `✔ ${resItem.titulo.replace(/^[^\w]+/g, '').split(' ')[0] || 'Listo'}`;
+                    btn.classList.add('is-done');
+                    if (chosenSpan) chosenSpan.innerText = `✔ ${resItem.titulo.replace(/^[^\w]+/g, '').split(' ')[0] || 'Listo'}`;
                     await wait(800);
-                    activeChoiceBtn.classList.remove('is-done');
-                    chosenSpan.innerText = '📝 Resolución';
+                    btn.classList.remove('is-done');
+                    if (chosenSpan) chosenSpan.innerText = '📝 Resolución';
                 }
             });
 
@@ -377,13 +383,13 @@
             });
         });
 
-        portalDrop.addEventListener('mousedown', (e) => e.stopPropagation());
+        // Prevenir que clics dentro del menú lo cierren antes de tiempo
         portalDrop.addEventListener('click', (e) => e.stopPropagation());
 
         document.body.appendChild(portalDrop);
 
-        // Cierre solo si se hace clic fuera del portal y fuera del botón activo
-        document.addEventListener('mousedown', (e) => {
+        // Cierre al hacer clic fuera del desplegable y fuera del botón
+        document.addEventListener('click', (e) => {
             if (!portalDrop || portalDrop.style.display !== 'block') return;
             if (!portalDrop.contains(e.target) && (!activeChoiceBtn || !activeChoiceBtn.contains(e.target))) {
                 cerrarPortal();
