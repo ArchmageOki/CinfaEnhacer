@@ -5,6 +5,8 @@
 // @description  Cerrar/Rechazar ticket y botón de remitente a la izquierda con enganche reactivo al iframe de descripción
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
+// @updateURL    https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-cerrar-rechazar.user.js
+// @downloadURL  https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-cerrar-rechazar.user.js
 // @grant        unsafeWindow
 // @run-at       document-start
 // ==/UserScript==
