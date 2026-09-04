@@ -5,6 +5,8 @@
 // @description  Selector de plantillas idéntico a Select2 nativo con detección reactiva continua (SPA compatible)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
+// @updateURL    https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-plantillas.user.js
+// @downloadURL  https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-plantillas.user.js
 // @grant        GM_registerMenuCommand
 // @grant        unsafeWindow
 // @run-at       document-start
