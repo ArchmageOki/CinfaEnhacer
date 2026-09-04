@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.2
+// @version      2.3
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -1217,10 +1217,6 @@
             titulo: "❌ Ticket rechazado",
             obtenerTexto: () => `Hemos intentado contactar contigo en los últimos días pero no hemos obtenido respuesta.<br>
             Si aún necesitas asistencia contáctanos a través de helpdesk@cinfa.com o llamando al 1599.`
-        },
-        {
-            titulo: "✅ Resuelto estándar",
-            obtenerTexto: () => `Se realizan las comprobaciones pertinentes y se da por resuelta la petición.<br><br><b>${getFechaHoy()} - ${TECNICO_DEFECTO}</b>`
         }
     ];
 
