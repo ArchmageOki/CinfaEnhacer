@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ServiceDesk - Plantillas de Resolución
 // @namespace    http://tampermonkey.net/
-// @version      1.5
+// @version      1.6
 // @description  Selector Select2 perfectamente alineado en la barra de herramientas del editor Ze
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -196,7 +196,7 @@
     // =========================================================================
     const RESOLUCIONES = [
         {
-            titulo: "Instrucciones de TIM",
+            titulo: "✳️ Instrucciones de TIM",
             obtenerTexto: () => `Para cambiar tu contraseña debes acceder a TIM desde el siguiente enlace<br><br>
             http://virtualpassword.cinfa.com/Tim/Index<br><br>
             Deberás iniciar sesión con el número de tu tarjeta blanca de Cinfa y tu DNI con la letra mayúscula.<br>
@@ -240,52 +240,97 @@
     // =========================================================================
     // 💉 SOBRESCRITURA DE RESOLUCIÓN
     // =========================================================================
-    async function sobrescribirResolucion(htmlContent) {
+    
+async function sobrescribirResolucion(htmlContent) {
         const resolutionBox = document.getElementById('rf-resolutionBox') || document.querySelector('.desc-row[data-fname="resolution.content"]');
         if (!resolutionBox) return false;
 
         let insertado = false;
 
+        // 1. Intentar inyección a través de la API nativa de Zoho Editor (unsafeWindow)
+        try {
+            const targetWin = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+            const editorId = 'ze_form_req-form_resolution_content';
+            
+            if (targetWin.ZE && typeof targetWin.ZE.getEditor === 'function') {
+                const zeInst = targetWin.ZE.getEditor(editorId);
+                if (zeInst && typeof zeInst.setContent === 'function') {
+                    zeInst.setContent(htmlContent);
+                    insertado = true;
+                }
+            }
+        } catch (e) {
+            console.warn('[SDP Res] Error usando API nativa ZE:', e);
+        }
+
+        // 2. Inyección directa en el cuerpo editable del iframe con comandos de ejecución nativos
         const iframe = resolutionBox.querySelector('iframe.ze_area') || resolutionBox.querySelector('iframe');
         if (iframe) {
             try {
                 const doc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
+                const win = iframe.contentWindow;
+
                 if (doc && doc.body) {
-                    doc.body.innerHTML = htmlContent ? `<div>${htmlContent}</div>` : '';
-                    doc.body.dispatchEvent(new Event('input', { bubbles: true }));
+                    const editableBody = doc.body.classList.contains('ze_body') ? doc.body : (doc.querySelector('.ze_body') || doc.body);
 
-                    iframe.contentWindow.focus();
-                    doc.body.focus();
+                    win.focus();
+                    editableBody.focus();
 
-                    const win = iframe.contentWindow;
+                    // Seleccionar todo el contenido previo para sobrescribir
                     const sel = win.getSelection();
                     if (sel) {
                         const range = doc.createRange();
-                        range.selectNodeContents(doc.body);
+                        range.selectNodeContents(editableBody);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+
+                    // Intentar sustitución mediante execCommand para disparar eventos internos del editor
+                    let cmdSuccess = false;
+                    try {
+                        cmdSuccess = doc.execCommand('insertHTML', false, htmlContent);
+                    } catch (cmdErr) {
+                        cmdSuccess = false;
+                    }
+
+                    // Respaldo manual si execCommand falla
+                    if (!cmdSuccess) {
+                        editableBody.innerHTML = htmlContent ? `<div>${htmlContent}</div>` : '<div><br></div>';
+                    }
+
+                    // Disparar ciclo completo de eventos de mutación
+                    editableBody.dispatchEvent(new Event('beforeinput', { bubbles: true }));
+                    editableBody.dispatchEvent(new Event('input', { bubbles: true }));
+                    editableBody.dispatchEvent(new Event('change', { bubbles: true }));
+                    editableBody.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
+
+                    // Posicionar el cursor al final del texto insertado
+                    if (sel) {
+                        const range = doc.createRange();
+                        range.selectNodeContents(editableBody);
                         range.collapse(false);
                         sel.removeAllRanges();
                         sel.addRange(range);
                     }
+
                     insertado = true;
                 }
             } catch (e) {
-                console.warn('[SDP Res] Error iframe:', e);
+                console.warn('[SDP Res] Error accediendo al iframe de resolución:', e);
             }
         }
 
+        // 3. Sincronización del Textarea oculto de formulario
         const textarea = document.getElementById('form_req-form_resolution_content') || resolutionBox.querySelector('textarea[name="resolution.content"]');
         if (textarea) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlContent;
-            textarea.value = tempDiv.innerText || tempDiv.textContent || '';
-            textarea.dispatchEvent(new Event('change', { bubbles: true }));
+            textarea.value = htmlContent;
             textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            textarea.dispatchEvent(new Event('change', { bubbles: true }));
             insertado = true;
         }
 
         return insertado;
     }
-
     // =========================================================================
     // 🛠️ PORTAL FLOTANTE ROBUSTO
     // =========================================================================
