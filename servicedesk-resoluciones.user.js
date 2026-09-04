@@ -241,87 +241,68 @@
     // 💉 SOBRESCRITURA DE RESOLUCIÓN
     // =========================================================================
     
-async function sobrescribirResolucion(htmlContent) {
-        const resolutionBox = document.getElementById('rf-resolutionBox') || document.querySelector('.desc-row[data-fname="resolution.content"]');
-        if (!resolutionBox) return false;
-
+    async function sobrescribirResolucion(htmlContent) {
         let insertado = false;
 
-        // 1. Intentar inyección a través de la API nativa de Zoho Editor (unsafeWindow)
+        // 1. Intentar API oficial de Zoho Editor en SDP
         try {
             const targetWin = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
-            const editorId = 'ze_form_req-form_resolution_content';
+            const editorNames = ['form_req-form_resolution_content', 'ze_form_req-form_resolution_content'];
             
-            if (targetWin.ZE && typeof targetWin.ZE.getEditor === 'function') {
-                const zeInst = targetWin.ZE.getEditor(editorId);
-                if (zeInst && typeof zeInst.setContent === 'function') {
-                    zeInst.setContent(htmlContent);
+            for (const name of editorNames) {
+                if (targetWin.ZE && typeof targetWin.ZE.getEditor === 'function') {
+                    const inst = targetWin.ZE.getEditor(name);
+                    if (inst && typeof inst.setContent === 'function') {
+                        inst.setContent(htmlContent);
+                        insertado = true;
+                        break;
+                    }
+                }
+                if (targetWin[name] && typeof targetWin[name].setContent === 'function') {
+                    targetWin[name].setContent(htmlContent);
                     insertado = true;
+                    break;
                 }
             }
-        } catch (e) {
-            console.warn('[SDP Res] Error usando API nativa ZE:', e);
-        }
+        } catch (e) {}
 
-        // 2. Inyección directa en el cuerpo editable del iframe con comandos de ejecución nativos
-        const iframe = resolutionBox.querySelector('iframe.ze_area') || resolutionBox.querySelector('iframe');
+        // 2. Inyección física en el iframe específico de la resolución
+        const zeContainer = document.getElementById('ze_form_req-form_resolution_content') || document.getElementById('resolution.content_control');
+        const iframe = zeContainer ? zeContainer.querySelector('iframe.ze_area, iframe') : document.querySelector('#rf-resolutionBox iframe');
+
         if (iframe) {
             try {
                 const doc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
-                const win = iframe.contentWindow;
+                if (doc) {
+                    const targetEl = doc.querySelector('.ze_body') || doc.body;
+                    if (targetEl) {
+                        targetEl.focus();
+                        targetEl.innerHTML = htmlContent ? `<div>${htmlContent}</div>` : '<div><br></div>';
 
-                if (doc && doc.body) {
-                    const editableBody = doc.body.classList.contains('ze_body') ? doc.body : (doc.querySelector('.ze_body') || doc.body);
+                        // Disparar eventos nativos de cambio
+                        targetEl.dispatchEvent(new Event('input', { bubbles: true }));
+                        targetEl.dispatchEvent(new Event('change', { bubbles: true }));
 
-                    win.focus();
-                    editableBody.focus();
-
-                    // Seleccionar todo el contenido previo para sobrescribir
-                    const sel = win.getSelection();
-                    if (sel) {
-                        const range = doc.createRange();
-                        range.selectNodeContents(editableBody);
-                        sel.removeAllRanges();
-                        sel.addRange(range);
+                        // Posicionar cursor al final
+                        const win = iframe.contentWindow;
+                        if (win && win.getSelection) {
+                            const sel = win.getSelection();
+                            const range = doc.createRange();
+                            range.selectNodeContents(targetEl);
+                            range.collapse(false);
+                            sel.removeAllRanges();
+                            sel.addRange(range);
+                        }
+                        insertado = true;
                     }
-
-                    // Intentar sustitución mediante execCommand para disparar eventos internos del editor
-                    let cmdSuccess = false;
-                    try {
-                        cmdSuccess = doc.execCommand('insertHTML', false, htmlContent);
-                    } catch (cmdErr) {
-                        cmdSuccess = false;
-                    }
-
-                    // Respaldo manual si execCommand falla
-                    if (!cmdSuccess) {
-                        editableBody.innerHTML = htmlContent ? `<div>${htmlContent}</div>` : '<div><br></div>';
-                    }
-
-                    // Disparar ciclo completo de eventos de mutación
-                    editableBody.dispatchEvent(new Event('beforeinput', { bubbles: true }));
-                    editableBody.dispatchEvent(new Event('input', { bubbles: true }));
-                    editableBody.dispatchEvent(new Event('change', { bubbles: true }));
-                    editableBody.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
-
-                    // Posicionar el cursor al final del texto insertado
-                    if (sel) {
-                        const range = doc.createRange();
-                        range.selectNodeContents(editableBody);
-                        range.collapse(false);
-                        sel.removeAllRanges();
-                        sel.addRange(range);
-                    }
-
-                    insertado = true;
                 }
             } catch (e) {
-                console.warn('[SDP Res] Error accediendo al iframe de resolución:', e);
+                console.warn('[SDP Res] Error escribiendo en el iframe:', e);
             }
         }
 
-        // 3. Sincronización del Textarea oculto de formulario
-        const textarea = document.getElementById('form_req-form_resolution_content') || resolutionBox.querySelector('textarea[name="resolution.content"]');
+        // 3. Sincronizar el textarea nativo de respaldo
+        const textarea = document.getElementById('form_req-form_resolution_content') || document.querySelector('textarea[name="resolution.content"]');
         if (textarea) {
             textarea.value = htmlContent;
             textarea.dispatchEvent(new Event('input', { bubbles: true }));
@@ -331,6 +312,7 @@ async function sobrescribirResolucion(htmlContent) {
 
         return insertado;
     }
+    
     // =========================================================================
     // 🛠️ PORTAL FLOTANTE ROBUSTO
     // =========================================================================
