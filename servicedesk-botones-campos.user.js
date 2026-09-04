@@ -5,6 +5,8 @@
 // @description  Botones compactos a la izquierda de Estado, Grupo Asignado, Técnico, Tipo de ticket, Vía ticket y Ubicación
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
+// @updateURL    https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-botones-campos.user.js
+// @downloadURL  https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-botones-campos.user.js
 // @grant        unsafeWindow
 // @run-at       document-start
 // ==/UserScript==
