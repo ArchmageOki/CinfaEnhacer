@@ -564,5 +564,30 @@
             setTheme(currentTheme === 'light' ? 'dark' : 'light');
         });
     </script>
+    <script>
+    async function sincronizarVersionesVisuales() {
+        const mapeo = [
+            { url: 'servicedesk-suite.user.js', selector: '.card-sdp .card-version' },
+            { url: 'vozitel-copiar-correo.user.js', selector: '.card-vozitel .card-version' }
+        ];
+
+        for (const item of mapeo) {
+            try {
+                const res = await fetch(item.url + '?t=' + Date.now());
+                if (!res.ok) continue;
+                const texto = await res.text();
+                const match = texto.match(/@version\s+([0-9\.]+)/);
+                if (match && match[1]) {
+                    const el = document.querySelector(item.selector);
+                    if (el) el.textContent = 'v' + match[1];
+                }
+            } catch (e) {
+                console.warn('No se pudo leer la versión de ' + item.url, e);
+            }
+        }
+    }
+
+    sincronizarVersionesVisuales();
+</script>
 </body>
 </html>
