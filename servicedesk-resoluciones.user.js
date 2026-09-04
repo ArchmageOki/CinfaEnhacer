@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         ServiceDesk - Plantillas de Resolución
 // @namespace    http://tampermonkey.net/
-// @version      1.3
-// @description  Selector Select2 integrado a la derecha de la barra de herramientas del editor Ze sin romper estilos
+// @version      1.4
+// @description  Selector Select2 perfectamente alineado en la barra de herramientas del editor Ze
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
 // @updateURL    https://archmageoki.github.io/CinfaEnhacer/servicedesk-resoluciones.user.js
@@ -61,102 +61,85 @@
     const wait = ms => new Promise(res => setTimeout(res, ms));
 
     // =========================================================================
-    // 🎨 ESTILOS (Cero alteraciones en clases nativas de SDP)
+    // 🎨 ESTILOS INTEGRADOS Y ENCUADRE
     // =========================================================================
     const cssId = 'sdp-res-toolbar-style';
     if (!document.getElementById(cssId)) {
         const estilo = document.createElement('style');
         estilo.id = cssId;
         estilo.innerHTML = `
+            /* Asegurar referencia de posición en la barra de herramientas */
+            #resolution\\.content_control .ze_SCmb {
+                position: relative !important;
+            }
+
             #sdp-res-select2-wrapper {
-                float: right !important;
-                margin-top: 2px !important;
-                margin-right: 6px !important;
-                width: 190px !important;
+                position: absolute !important;
+                right: 6px !important;
+                top: 2px !important;
+                width: 175px !important;
+                height: 22px !important;
                 font-family: Arial, Helvetica, sans-serif !important;
                 user-select: none !important;
-                position: relative !important;
-                line-height: normal !important;
+                z-index: 100 !important;
             }
 
             .sdp-res-choice {
-                display: block !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
                 height: 22px !important;
-                padding: 0 0 0 7px !important;
-                overflow: hidden !important;
-                position: relative !important;
+                padding: 0 6px !important;
                 border: 1px solid #c9c9c9 !important;
-                white-space: nowrap !important;
-                line-height: 20px !important;
-                color: #444444 !important;
-                text-decoration: none !important;
-                border-radius: 3px !important;
+                border-radius: 2px !important;
                 background-color: #fafafa !important;
+                color: #333 !important;
+                text-decoration: none !important;
                 cursor: pointer !important;
                 box-sizing: border-box !important;
                 font-size: 11px !important;
                 font-weight: 600 !important;
-                transition: border-color 0.15s !important;
+                line-height: 20px !important;
+                transition: all 0.15s ease !important;
             }
 
             .sdp-res-choice:hover {
                 background-color: #f0f0f0 !important;
-                border-color: #999999 !important;
-                color: #111 !important;
+                border-color: #888888 !important;
+                color: #000 !important;
             }
 
             .sdp-res-chosen {
-                margin-right: 20px !important;
-                display: block !important;
                 overflow: hidden !important;
                 white-space: nowrap !important;
                 text-overflow: ellipsis !important;
+                padding-right: 4px !important;
             }
 
             .sdp-res-arrow {
                 display: inline-block !important;
-                width: 16px !important;
-                height: 100% !important;
-                position: absolute !important;
-                right: 0 !important;
-                top: 0 !important;
-                border-left: 1px solid #e0e0e0 !important;
-                background: #f4f4f4 !important;
-                border-top-right-radius: 2px !important;
-                border-bottom-right-radius: 2px !important;
-            }
-
-            .sdp-res-arrow b {
-                border-color: #666 transparent transparent transparent !important;
-                border-style: solid !important;
-                border-width: 4px 4px 0 4px !important;
-                height: 0 !important;
-                left: 50% !important;
-                margin-left: -4px !important;
-                margin-top: -2px !important;
-                position: absolute !important;
-                top: 50% !important;
                 width: 0 !important;
+                height: 0 !important;
+                border-left: 4px solid transparent !important;
+                border-right: 4px solid transparent !important;
+                border-top: 4px solid #555555 !important;
+                margin-left: 2px !important;
+                flex-shrink: 0 !important;
             }
 
-            /* Desplegable montado en document.body para evitar overflow */
+            /* Desplegable portal anclado a pantalla completa */
             #sdp-res-portal-drop {
                 position: fixed !important;
                 width: 240px !important;
                 background: #ffffff !important;
-                border: 1px solid #aaa !important;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+                border: 1px solid #999999 !important;
+                box-shadow: 0 4px 14px rgba(0,0,0,0.25) !important;
                 border-radius: 3px !important;
                 z-index: 2147483647 !important;
                 display: none;
                 box-sizing: border-box !important;
-                padding-top: 4px !important;
+                padding: 4px !important;
                 font-family: Arial, Helvetica, sans-serif !important;
-            }
-
-            .sdp-res-search {
-                padding: 4px 6px !important;
-                box-sizing: border-box !important;
             }
 
             .sdp-res-search input {
@@ -170,11 +153,12 @@
                 outline: none !important;
                 box-sizing: border-box !important;
                 background: #fff !important;
+                margin-bottom: 3px !important;
             }
 
             .sdp-res-results {
-                max-height: 210px !important;
-                padding: 3px 0 !important;
+                max-height: 220px !important;
+                padding: 0 !important;
                 margin: 0 !important;
                 overflow-x: hidden !important;
                 overflow-y: auto !important;
@@ -190,11 +174,12 @@
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
                 line-height: 16px !important;
+                border-radius: 2px !important;
             }
 
             .sdp-res-results li:hover {
                 background-color: #c13b38 !important;
-                color: #fff !important;
+                color: #ffffff !important;
             }
 
             .sdp-res-choice.is-done {
@@ -241,7 +226,7 @@
     ];
 
     // =========================================================================
-    // 💉 INSERCIÓN Y SOBRESCRITURA
+    // 💉 SOBRESCRITURA DE RESOLUCIÓN
     // =========================================================================
     async function sobrescribirResolucion(htmlContent) {
         const resolutionBox = document.getElementById('rf-resolutionBox') || document.querySelector('.desc-row[data-fname="resolution.content"]');
@@ -249,7 +234,6 @@
 
         let insertado = false;
 
-        // 1. Iframe nativo del editor Ze
         const iframe = resolutionBox.querySelector('iframe.ze_area') || resolutionBox.querySelector('iframe');
         if (iframe) {
             try {
@@ -277,7 +261,6 @@
             }
         }
 
-        // 2. Textarea oculto
         const textarea = document.getElementById('form_req-form_resolution_content') || resolutionBox.querySelector('textarea[name="resolution.content"]');
         if (textarea) {
             const tempDiv = document.createElement('div');
@@ -292,14 +275,14 @@
     }
 
     // =========================================================================
-    // 🛠️ CREACIÓN DEL MENÚ PORTAL GLOBAL
+    // 🛠️ PORTAL FLOTANTE ROBUSTO
     // =========================================================================
     let portalDrop = null;
     let portalInput = null;
     let portalList = null;
     let activeChoiceBtn = null;
 
-    function asegurarPortal() {
+    function crearPortal() {
         if (portalDrop) return portalDrop;
 
         portalDrop = document.createElement('div');
@@ -356,22 +339,23 @@
         });
 
         portalDrop.addEventListener('mousedown', (e) => e.stopPropagation());
+        portalDrop.addEventListener('click', (e) => e.stopPropagation());
+
         document.body.appendChild(portalDrop);
 
-        document.addEventListener('click', (e) => {
-            if (portalDrop.style.display === 'block' && !portalDrop.contains(e.target) && (!activeChoiceBtn || !activeChoiceBtn.contains(e.target))) {
+        // Cierre solo si se hace clic fuera del portal y fuera del botón activo
+        document.addEventListener('mousedown', (e) => {
+            if (!portalDrop || portalDrop.style.display !== 'block') return;
+            if (!portalDrop.contains(e.target) && (!activeChoiceBtn || !activeChoiceBtn.contains(e.target))) {
                 cerrarPortal();
             }
         });
-
-        window.addEventListener('resize', cerrarPortal);
-        window.addEventListener('scroll', cerrarPortal, true);
 
         return portalDrop;
     }
 
     function abrirPortal(choiceBtn) {
-        asegurarPortal();
+        crearPortal();
         activeChoiceBtn = choiceBtn;
 
         const rect = choiceBtn.getBoundingClientRect();
@@ -392,15 +376,15 @@
     }
 
     // =========================================================================
-    // 🛠️ INYECCIÓN FLOTANTE DENTRO DE LA BARRA DE HERRAMIENTAS
+    // 🛠️ INYECCIÓN
     // =========================================================================
     function inyectarBotonResoluciones() {
         if (!esModoValido()) return;
         if (document.getElementById('sdp-res-select2-wrapper')) return;
 
-        // Contenedor interno de la barra de botones del editor Ze de resolución
-        const toolbarDiv = document.querySelector('#resolution\\.content_control .ze_SCmb > div');
-        if (!toolbarDiv) return;
+        // Anclamos exactamente a la barra de herramientas del editor Ze de resolución
+        const toolbar = document.querySelector('#resolution\\.content_control .ze_SCmb');
+        if (!toolbar) return;
 
         const wrapper = document.createElement('div');
         wrapper.id = 'sdp-res-select2-wrapper';
@@ -411,10 +395,11 @@
         choice.tabIndex = -1;
         choice.innerHTML = `
             <span class="sdp-res-chosen">📝 Resolución</span>
-            <span class="sdp-res-arrow" role="presentation"><b role="presentation"></b></span>
+            <span class="sdp-res-arrow"></span>
         `;
 
-        choice.addEventListener('click', (e) => {
+        // Intercepción en mousedown para adelantarnos al blur del editor Ze
+        choice.addEventListener('mousedown', (e) => {
             e.preventDefault();
             e.stopPropagation();
 
@@ -425,10 +410,8 @@
             }
         });
 
-        choice.addEventListener('mousedown', (e) => e.stopPropagation());
-
         wrapper.appendChild(choice);
-        toolbarDiv.insertBefore(wrapper, toolbarDiv.firstChild);
+        toolbar.appendChild(wrapper);
     }
 
     const observer = new MutationObserver(() => {
