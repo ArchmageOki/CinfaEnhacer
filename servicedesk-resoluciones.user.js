@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         ServiceDesk - Plantillas de Resolución
 // @namespace    http://tampermonkey.net/
-// @version      1.1
-// @description  Selector Select2 con buscador integrado en la barra de herramientas del editor de resolución
+// @version      1.2
+// @description  Selector Select2 con buscador integrado en la cabecera del panel de resolución
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
 // @updateURL    https://archmageoki.github.io/CinfaEnhacer/servicedesk-resoluciones.user.js
@@ -61,164 +61,151 @@
     const wait = ms => new Promise(res => setTimeout(res, ms));
 
     // =========================================================================
-    // 🎨 ESTILOS (evitar recorte por overflow del editor nativo)
+    // 🎨 ESTILOS (Sin modificar contenedores nativos de SDP)
     // =========================================================================
     const cssId = 'sdp-res-templates-style';
     if (!document.getElementById(cssId)) {
         const estilo = document.createElement('style');
         estilo.id = cssId;
         estilo.innerHTML = `
-            /* Permitir que los menús se desborden de la barra de herramientas */
-            #resolution\\.content_control .ze,
-            #resolution\\.content_control .ze_SCmb,
-            #resolution\\.content_control .ze_SCmb > div {
-                overflow: visible !important;
-                display: flex !important;
-                flex-wrap: wrap !important;
-                align-items: center !important;
-                position: relative !important;
-            }
-
             #sdp-res-select2-wrapper {
-                display: inline-block !important;
-                position: relative !important;
-                margin-left: auto !important;
-                margin-right: 6px !important;
-                width: 210px !important;
-                font-family: Arial, Helvetica, sans-serif !important;
-                user-select: none !important;
-                z-index: 100000 !important;
+                display: inline-block;
+                position: relative;
+                vertical-align: middle;
+                margin-left: 20px;
+                width: 220px;
+                font-family: Arial, Helvetica, sans-serif;
+                user-select: none;
+                font-weight: normal;
+                font-size: 12px;
+                z-index: 9999;
             }
 
             .sdp-res-choice {
-                display: block !important;
-                height: 24px !important;
-                padding: 0 0 0 8px !important;
-                overflow: hidden !important;
-                position: relative !important;
-                border: 1px solid #c9c9c9 !important;
-                white-space: nowrap !important;
-                line-height: 22px !important;
-                color: #444444 !important;
-                text-decoration: none !important;
-                border-radius: 3px !important;
-                background-color: #fafafa !important;
-                cursor: pointer !important;
-                box-sizing: border-box !important;
-                font-size: 11px !important;
-                font-weight: 600 !important;
-                transition: all 0.15s ease !important;
+                display: block;
+                height: 26px;
+                padding: 0 0 0 8px;
+                overflow: hidden;
+                position: relative;
+                border: 1px solid #d2d2d2;
+                white-space: nowrap;
+                line-height: 24px;
+                color: #444444;
+                text-decoration: none;
+                border-radius: 3px;
+                background-color: #fcfcfc;
+                cursor: pointer;
+                box-sizing: border-box;
+                transition: border-color 0.15s;
             }
 
             .sdp-res-choice:hover {
-                background-color: #f0f0f0 !important;
-                border-color: #a8a8a8 !important;
-                color: #111 !important;
+                border-color: #b0b0b0;
             }
 
             #sdp-res-select2-wrapper.is-open .sdp-res-choice {
-                border-bottom-left-radius: 0 !important;
-                border-bottom-right-radius: 0 !important;
-                border-color: #aaa !important;
-                background: #fff !important;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-color: #aaa;
+                background: #fff;
             }
 
             .sdp-res-chosen {
-                margin-right: 22px !important;
-                display: block !important;
-                overflow: hidden !important;
-                white-space: nowrap !important;
-                text-overflow: ellipsis !important;
+                margin-right: 24px;
+                display: block;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                font-weight: 600;
+                font-size: 11px;
             }
 
             .sdp-res-arrow {
-                display: inline-block !important;
-                width: 18px !important;
-                height: 100% !important;
-                position: absolute !important;
-                right: 0 !important;
-                top: 0 !important;
-                border-left: 1px solid #e0e0e0 !important;
-                background: #f4f4f4 !important;
-                border-top-right-radius: 2px !important;
-                border-bottom-right-radius: 2px !important;
+                display: inline-block;
+                width: 18px;
+                height: 100%;
+                position: absolute;
+                right: 0;
+                top: 0;
+                border-left: 1px solid #e2e2e2;
+                background: #f7f7f7;
+                border-top-right-radius: 3px;
+                border-bottom-right-radius: 3px;
             }
 
             .sdp-res-arrow b {
-                border-color: #666 transparent transparent transparent !important;
-                border-style: solid !important;
-                border-width: 4px 4px 0 4px !important;
-                height: 0 !important;
-                left: 50% !important;
-                margin-left: -4px !important;
-                margin-top: -2px !important;
-                position: absolute !important;
-                top: 50% !important;
-                width: 0 !important;
+                border-color: #666 transparent transparent transparent;
+                border-style: solid;
+                border-width: 4px 4px 0 4px;
+                height: 0;
+                left: 50%;
+                margin-left: -4px;
+                margin-top: -2px;
+                position: absolute;
+                top: 50%;
+                width: 0;
             }
 
             #sdp-res-select2-wrapper.is-open .sdp-res-arrow b {
-                border-color: transparent transparent #666 transparent !important;
-                border-width: 0 4px 4px 4px !important;
+                border-color: transparent transparent #666 transparent;
+                border-width: 0 4px 4px 4px;
             }
 
             .sdp-res-drop {
-                position: absolute !important;
-                top: 100% !important;
-                right: 0 !important;
-                width: 250px !important;
-                background: #ffffff !important;
-                border: 1px solid #aaa !important;
-                border-top: 0 !important;
-                box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25) !important;
-                border-radius: 0 0 3px 3px !important;
-                z-index: 9999999 !important;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 250px;
+                background: #fff;
+                border: 1px solid #aaa;
+                border-top: 0;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+                border-radius: 0 0 3px 3px;
+                z-index: 999999;
                 display: none;
-                box-sizing: border-box !important;
-                margin-top: -1px !important;
-                padding-top: 5px !important;
+                box-sizing: border-box;
+                margin-top: -1px;
+                padding-top: 4px;
             }
 
             #sdp-res-select2-wrapper.is-open .sdp-res-drop {
-                display: block !important;
+                display: block;
             }
 
             .sdp-res-search {
-                padding: 4px 6px !important;
-                box-sizing: border-box !important;
+                padding: 4px 6px;
             }
 
             .sdp-res-search input {
-                width: 100% !important;
-                height: 24px !important;
-                padding: 2px 6px !important;
-                font-size: 11px !important;
-                font-family: inherit !important;
-                border: 1px solid #aaa !important;
-                border-radius: 2px !important;
-                outline: none !important;
-                box-sizing: border-box !important;
-                background: #fff !important;
+                width: 100%;
+                height: 24px;
+                padding: 2px 6px;
+                font-size: 11px;
+                font-family: inherit;
+                border: 1px solid #aaa;
+                border-radius: 2px;
+                outline: none;
+                box-sizing: border-box;
             }
 
             .sdp-res-results {
-                max-height: 220px !important;
-                padding: 3px 0 !important;
-                margin: 0 !important;
-                overflow-x: hidden !important;
-                overflow-y: auto !important;
-                list-style: none !important;
+                max-height: 210px;
+                padding: 3px 0;
+                margin: 0;
+                overflow-x: hidden;
+                overflow-y: auto;
+                list-style: none;
             }
 
             .sdp-res-results li {
-                padding: 6px 8px !important;
-                font-size: 11px !important;
-                color: #333 !important;
-                cursor: pointer !important;
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                line-height: 16px !important;
+                padding: 5px 8px;
+                font-size: 11px;
+                color: #333;
+                cursor: pointer;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                line-height: 16px;
             }
 
             .sdp-res-results li:hover {
@@ -270,15 +257,34 @@
     ];
 
     // =========================================================================
-    // 💉 INSERCIÓN Y SOBRESCRITURA
+    // 💉 SOBRESCRITURA DE RESOLUCIÓN Y APERTURA DE PANEL
     // =========================================================================
+    async function asegurarPanelAbierto() {
+        const panel = document.getElementById('rfres-panel1-zc');
+        const contentBox = document.getElementById('rf-resolutionBox');
+
+        const estaCerradoPorAttr = panel && panel.getAttribute('aria-expanded') === 'false';
+        const estaCerradoPorEstilo = contentBox && (contentBox.style.display === 'none' || getComputedStyle(contentBox).display === 'none');
+
+        if (estaCerradoPorAttr || estaCerradoPorEstilo) {
+            const heading = document.querySelector('z-cpheading.zcollapsiblepanel__heading') || (panel ? panel.querySelector('.zcollapsiblepanel__header') : null);
+            if (heading) {
+                const toggleBtn = heading.querySelector('.p10') || heading;
+                toggleBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                await wait(250);
+            }
+        }
+    }
+
     async function sobrescribirResolucion(htmlContent) {
+        await asegurarPanelAbierto();
+
         const resolutionBox = document.getElementById('rf-resolutionBox') || document.querySelector('.desc-row[data-fname="resolution.content"]');
         if (!resolutionBox) return false;
 
         let insertado = false;
 
-        // 1. Escribir dentro del iframe del editor enriquecido
+        // 1. Iframe nativo del editor Ze
         const iframe = resolutionBox.querySelector('iframe.ze_area') || resolutionBox.querySelector('iframe');
         if (iframe) {
             try {
@@ -306,7 +312,7 @@
             }
         }
 
-        // 2. Textarea oculto
+        // 2. Textarea nativo de sincronización
         const textarea = document.getElementById('form_req-form_resolution_content') || resolutionBox.querySelector('textarea[name="resolution.content"]');
         if (textarea) {
             const tempDiv = document.createElement('div');
@@ -321,14 +327,15 @@
     }
 
     // =========================================================================
-    // 🛠️ INYECCIÓN
+    // 🛠️ INYECCIÓN EN LA CABECERA DE RESOLUCIÓN
     // =========================================================================
     function inyectarBotonResoluciones() {
         if (!esModoValido()) return;
         if (document.getElementById('sdp-res-select2-wrapper')) return;
 
-        const toolbar = document.querySelector('#resolution\\.content_control .ze_SCmb > div');
-        if (!toolbar) return;
+        // Inyectamos dentro del div .p10 de la cabecera de resolución
+        const headingDiv = document.querySelector('z-cpheading.zcollapsiblepanel__heading .p10');
+        if (!headingDiv) return;
 
         const wrapper = document.createElement('div');
         wrapper.id = 'sdp-res-select2-wrapper';
@@ -362,8 +369,7 @@
             li.innerText = resItem.titulo;
             li.title = resItem.titulo;
 
-            // Se usa mousedown para actuar antes de cualquier blur del editor
-            li.addEventListener('mousedown', async (e) => {
+            li.addEventListener('click', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -388,7 +394,6 @@
         wrapper.appendChild(choice);
         wrapper.appendChild(drop);
 
-        // Búsqueda en vivo
         searchInput.addEventListener('input', () => {
             const filtro = searchInput.value.toLowerCase().trim();
             resultsList.querySelectorAll('li').forEach(li => {
@@ -397,8 +402,12 @@
             });
         });
 
-        // Toggle del desplegable
-        const toggleMenu = (e) => {
+        // Evitar que el clic en el selector repliegue el panel acordeón de SDP
+        wrapper.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        choice.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             const isOpen = wrapper.classList.toggle('is-open');
@@ -407,11 +416,7 @@
                 searchInput.dispatchEvent(new Event('input'));
                 setTimeout(() => searchInput.focus(), 60);
             }
-        };
-
-        choice.addEventListener('click', toggleMenu);
-        choice.addEventListener('mousedown', (e) => e.stopPropagation());
-        drop.addEventListener('mousedown', (e) => e.stopPropagation());
+        });
 
         document.addEventListener('click', (e) => {
             if (!wrapper.contains(e.target)) {
@@ -419,7 +424,7 @@
             }
         });
 
-        toolbar.appendChild(wrapper);
+        headingDiv.appendChild(wrapper);
     }
 
     const observer = new MutationObserver(() => {
