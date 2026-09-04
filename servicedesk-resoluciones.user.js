@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         ServiceDesk - Plantillas de Resolución
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Selector Select2 con buscador integrado en la barra de herramientas del editor de resolución
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
-// @updateURL    https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-resoluciones.user.js
-// @downloadURL  https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-resoluciones.user.js
+// @updateURL    https://archmageoki.github.io/CinfaEnhacer/servicedesk-resoluciones.user.js
+// @downloadURL  https://archmageoki.github.io/CinfaEnhacer/servicedesk-resoluciones.user.js
 // @grant        GM_registerMenuCommand
 // @grant        unsafeWindow
 // @run-at       document-start
@@ -61,162 +61,167 @@
     const wait = ms => new Promise(res => setTimeout(res, ms));
 
     // =========================================================================
-    // 🎨 ESTILOS INTEGRADOS (Toolbar + Desplegable Select2)
+    // 🎨 ESTILOS (evitar recorte por overflow del editor nativo)
     // =========================================================================
     const cssId = 'sdp-res-templates-style';
     if (!document.getElementById(cssId)) {
         const estilo = document.createElement('style');
         estilo.id = cssId;
         estilo.innerHTML = `
-            /* Alinear la barra de herramientas como flex para mandar el botón a la derecha */
+            /* Permitir que los menús se desborden de la barra de herramientas */
+            #resolution\\.content_control .ze,
+            #resolution\\.content_control .ze_SCmb,
             #resolution\\.content_control .ze_SCmb > div {
+                overflow: visible !important;
                 display: flex !important;
                 flex-wrap: wrap !important;
                 align-items: center !important;
+                position: relative !important;
             }
 
             #sdp-res-select2-wrapper {
-                display: inline-block;
-                position: relative;
-                margin-left: auto !important; /* Lo empuja a la derecha de los iconos */
-                margin-right: 5px !important;
-                width: 210px;
-                font-family: Arial, Helvetica, sans-serif;
-                user-select: none;
-                z-index: 100;
+                display: inline-block !important;
+                position: relative !important;
+                margin-left: auto !important;
+                margin-right: 6px !important;
+                width: 210px !important;
+                font-family: Arial, Helvetica, sans-serif !important;
+                user-select: none !important;
+                z-index: 100000 !important;
             }
 
             .sdp-res-choice {
-                display: block;
-                height: 24px;
-                padding: 0 0 0 8px;
-                overflow: hidden;
-                position: relative;
-                border: 1px solid #c9c9c9;
-                white-space: nowrap;
-                line-height: 22px;
-                color: #444444;
-                text-decoration: none;
-                border-radius: 3px;
-                background-color: #fafafa;
-                cursor: pointer;
-                box-sizing: border-box;
-                font-size: 11px;
-                font-weight: 600;
-                transition: all 0.15s ease;
+                display: block !important;
+                height: 24px !important;
+                padding: 0 0 0 8px !important;
+                overflow: hidden !important;
+                position: relative !important;
+                border: 1px solid #c9c9c9 !important;
+                white-space: nowrap !important;
+                line-height: 22px !important;
+                color: #444444 !important;
+                text-decoration: none !important;
+                border-radius: 3px !important;
+                background-color: #fafafa !important;
+                cursor: pointer !important;
+                box-sizing: border-box !important;
+                font-size: 11px !important;
+                font-weight: 600 !important;
+                transition: all 0.15s ease !important;
             }
 
             .sdp-res-choice:hover {
-                background-color: #f0f0f0;
-                border-color: #a8a8a8;
-                color: #111;
+                background-color: #f0f0f0 !important;
+                border-color: #a8a8a8 !important;
+                color: #111 !important;
             }
 
             #sdp-res-select2-wrapper.is-open .sdp-res-choice {
-                border-bottom-left-radius: 0;
-                border-bottom-right-radius: 0;
-                border-color: #aaa;
-                background: #fff;
+                border-bottom-left-radius: 0 !important;
+                border-bottom-right-radius: 0 !important;
+                border-color: #aaa !important;
+                background: #fff !important;
             }
 
             .sdp-res-chosen {
-                margin-right: 22px;
-                display: block;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
+                margin-right: 22px !important;
+                display: block !important;
+                overflow: hidden !important;
+                white-space: nowrap !important;
+                text-overflow: ellipsis !important;
             }
 
             .sdp-res-arrow {
-                display: inline-block;
-                width: 18px;
-                height: 100%;
-                position: absolute;
-                right: 0;
-                top: 0;
-                border-left: 1px solid #e0e0e0;
-                background: #f4f4f4;
-                border-top-right-radius: 2px;
-                border-bottom-right-radius: 2px;
+                display: inline-block !important;
+                width: 18px !important;
+                height: 100% !important;
+                position: absolute !important;
+                right: 0 !important;
+                top: 0 !important;
+                border-left: 1px solid #e0e0e0 !important;
+                background: #f4f4f4 !important;
+                border-top-right-radius: 2px !important;
+                border-bottom-right-radius: 2px !important;
             }
 
             .sdp-res-arrow b {
-                border-color: #666 transparent transparent transparent;
-                border-style: solid;
-                border-width: 4px 4px 0 4px;
-                height: 0;
-                left: 50%;
-                margin-left: -4px;
-                margin-top: -2px;
-                position: absolute;
-                top: 50%;
-                width: 0;
+                border-color: #666 transparent transparent transparent !important;
+                border-style: solid !important;
+                border-width: 4px 4px 0 4px !important;
+                height: 0 !important;
+                left: 50% !important;
+                margin-left: -4px !important;
+                margin-top: -2px !important;
+                position: absolute !important;
+                top: 50% !important;
+                width: 0 !important;
             }
 
             #sdp-res-select2-wrapper.is-open .sdp-res-arrow b {
-                border-color: transparent transparent #666 transparent;
-                border-width: 0 4px 4px 4px;
+                border-color: transparent transparent #666 transparent !important;
+                border-width: 0 4px 4px 4px !important;
             }
 
             .sdp-res-drop {
-                position: absolute;
-                top: 100%;
-                right: 0;
-                width: 240px;
-                background: #fff;
-                border: 1px solid #aaa;
-                border-top: 0;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-                border-radius: 0 0 3px 3px;
-                z-index: 999999;
+                position: absolute !important;
+                top: 100% !important;
+                right: 0 !important;
+                width: 250px !important;
+                background: #ffffff !important;
+                border: 1px solid #aaa !important;
+                border-top: 0 !important;
+                box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25) !important;
+                border-radius: 0 0 3px 3px !important;
+                z-index: 9999999 !important;
                 display: none;
-                box-sizing: border-box;
-                margin-top: -1px;
-                padding-top: 4px;
+                box-sizing: border-box !important;
+                margin-top: -1px !important;
+                padding-top: 5px !important;
             }
 
             #sdp-res-select2-wrapper.is-open .sdp-res-drop {
-                display: block;
+                display: block !important;
             }
 
             .sdp-res-search {
-                padding: 4px 6px;
+                padding: 4px 6px !important;
+                box-sizing: border-box !important;
             }
 
             .sdp-res-search input {
-                width: 100%;
-                height: 24px;
-                padding: 2px 6px;
-                font-size: 11px;
-                font-family: inherit;
-                border: 1px solid #aaa;
-                border-radius: 2px;
-                outline: none;
-                box-sizing: border-box;
+                width: 100% !important;
+                height: 24px !important;
+                padding: 2px 6px !important;
+                font-size: 11px !important;
+                font-family: inherit !important;
+                border: 1px solid #aaa !important;
+                border-radius: 2px !important;
+                outline: none !important;
+                box-sizing: border-box !important;
+                background: #fff !important;
             }
 
             .sdp-res-results {
-                max-height: 200px;
-                padding: 3px 0;
-                margin: 0;
-                overflow-x: hidden;
-                overflow-y: auto;
-                list-style: none;
+                max-height: 220px !important;
+                padding: 3px 0 !important;
+                margin: 0 !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                list-style: none !important;
             }
 
             .sdp-res-results li {
-                padding: 5px 8px;
-                font-size: 11px;
-                color: #333;
-                cursor: pointer;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                line-height: 16px;
+                padding: 6px 8px !important;
+                font-size: 11px !important;
+                color: #333 !important;
+                cursor: pointer !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                line-height: 16px !important;
             }
 
-            .sdp-res-results li:hover,
-            .sdp-res-results li.is-highlighted {
+            .sdp-res-results li:hover {
                 background-color: #c13b38 !important;
                 color: #fff !important;
             }
@@ -231,9 +236,13 @@
     }
 
     // =========================================================================
-    // 📝 PLANTILLAS DE RESOLUCIÓN (Personaliza tus textos aquí)
+    // 📝 PLANTILLAS DE RESOLUCIÓN
     // =========================================================================
     const RESOLUCIONES = [
+        {
+            titulo: "🧪 Resolución de Prueba",
+            obtenerTexto: () => `Texto de prueba de la resolución.<br>Se solucionó reiniciando el equipo.<br><br><b>${getFechaHoy()} - ${TECNICO_DEFECTO}</b>`
+        },
         {
             titulo: "✅ Resuelto estándar",
             obtenerTexto: () => `Se realizan las comprobaciones pertinentes y se da por resuelta la petición.<br><br><b>${getFechaHoy()} - ${TECNICO_DEFECTO}</b>`
@@ -261,7 +270,7 @@
     ];
 
     // =========================================================================
-    // 💉 INSERCIÓN Y SOBRESCRITURA DEL CONTENIDO
+    // 💉 INSERCIÓN Y SOBRESCRITURA
     // =========================================================================
     async function sobrescribirResolucion(htmlContent) {
         const resolutionBox = document.getElementById('rf-resolutionBox') || document.querySelector('.desc-row[data-fname="resolution.content"]');
@@ -293,11 +302,11 @@
                     insertado = true;
                 }
             } catch (e) {
-                console.warn('[SDP Res] Error accediendo al iframe:', e);
+                console.warn('[SDP Res] Error iframe:', e);
             }
         }
 
-        // 2. Sobrescribir textarea oculto nativo de sincronización
+        // 2. Textarea oculto
         const textarea = document.getElementById('form_req-form_resolution_content') || resolutionBox.querySelector('textarea[name="resolution.content"]');
         if (textarea) {
             const tempDiv = document.createElement('div');
@@ -312,13 +321,12 @@
     }
 
     // =========================================================================
-    // 🛠️ INYECCIÓN DEL DESPLEGABLE EN LA BARRA DE HERRAMIENTAS
+    // 🛠️ INYECCIÓN
     // =========================================================================
     function inyectarBotonResoluciones() {
         if (!esModoValido()) return;
         if (document.getElementById('sdp-res-select2-wrapper')) return;
 
-        // Contenedor exacto de la barra de botones del editor de resolución
         const toolbar = document.querySelector('#resolution\\.content_control .ze_SCmb > div');
         if (!toolbar) return;
 
@@ -354,9 +362,11 @@
             li.innerText = resItem.titulo;
             li.title = resItem.titulo;
 
-            li.addEventListener('click', async (e) => {
+            // Se usa mousedown para actuar antes de cualquier blur del editor
+            li.addEventListener('mousedown', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+
                 wrapper.classList.remove('is-open');
 
                 const chosenSpan = choice.querySelector('.sdp-res-chosen');
@@ -387,8 +397,8 @@
             });
         });
 
-        // Apertura / Cierre
-        choice.addEventListener('click', (e) => {
+        // Toggle del desplegable
+        const toggleMenu = (e) => {
             e.preventDefault();
             e.stopPropagation();
             const isOpen = wrapper.classList.toggle('is-open');
@@ -397,7 +407,11 @@
                 searchInput.dispatchEvent(new Event('input'));
                 setTimeout(() => searchInput.focus(), 60);
             }
-        });
+        };
+
+        choice.addEventListener('click', toggleMenu);
+        choice.addEventListener('mousedown', (e) => e.stopPropagation());
+        drop.addEventListener('mousedown', (e) => e.stopPropagation());
 
         document.addEventListener('click', (e) => {
             if (!wrapper.contains(e.target)) {
@@ -408,7 +422,6 @@
         toolbar.appendChild(wrapper);
     }
 
-    // Observador continuo para páginas dinámicas SPA
     const observer = new MutationObserver(() => {
         inyectarBotonResoluciones();
     });
