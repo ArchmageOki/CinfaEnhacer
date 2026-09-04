@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      2.1
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -627,14 +627,60 @@
         const estaCerradoPorAttr = panel && panel.getAttribute('aria-expanded') === 'false';
         const estaCerradoPorEstilo = contentBox && (contentBox.style.display === 'none' || getComputedStyle(contentBox).display === 'none');
 
+        // 1. Abrir el panel si está colapsado
         if (estaCerradoPorAttr || estaCerradoPorEstilo) {
             const heading = document.querySelector('z-cpheading.zcollapsiblepanel__heading') || (panel ? panel.querySelector('.zcollapsiblepanel__header') : null);
             if (heading) {
                 const toggleBtn = heading.querySelector('.p10') || heading;
                 toggleBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-                await wait(250);
+                await wait(280); // Esperar a que la animación termine de renderizar el iframe
             }
         }
+
+        // 2. Localizar y enfocar el editor dentro de la resolución
+        const zeContainer = document.getElementById('ze_form_req-form_resolution_content') || document.getElementById('resolution.content_control');
+        const iframe = zeContainer ? zeContainer.querySelector('iframe') : document.querySelector('#rf-resolutionBox iframe');
+
+        if (iframe) {
+            try {
+                iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                await wait(100);
+
+                const win = iframe.contentWindow;
+                const doc = iframe.contentDocument || (win && win.document);
+
+                if (win && doc && doc.body) {
+                    const targetEl = doc.body.classList.contains('ze_body') ? doc.body : (doc.querySelector('.ze_body') || doc.body);
+
+                    win.focus();
+                    targetEl.focus();
+
+                    // Colapsar el cursor al inicio del texto
+                    const sel = win.getSelection();
+                    if (sel) {
+                        const range = doc.createRange();
+                        range.setStart(targetEl, 0);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+                    return true;
+                }
+            } catch (e) {
+                console.warn('[SDP Suite] Error enfocando iframe de resolución:', e);
+            }
+        }
+
+        // Respaldo para textarea simple si no hay editor enriquecido
+        const resTextarea = document.getElementById('form_req-form_resolution_content') || document.querySelector('textarea[name="resolution.content"]');
+        if (resTextarea) {
+            resTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            resTextarea.focus();
+            resTextarea.setSelectionRange(0, 0);
+            return true;
+        }
+
+        return false;
     }
 
     async function ejecutarAccionCierre(btn, tipo) {
