@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ServiceDesk - Botones Rápidos de Campos
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  Botones compactos a la izquierda de Estado, Grupo Asignado, Técnico, Tipo de ticket, Vía ticket y Ubicación
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
