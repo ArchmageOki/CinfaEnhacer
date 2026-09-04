@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ServiceDesk - Cerrar / Rechazar / Añadir remitente
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Cerrar/Rechazar ticket y botón de remitente a la izquierda con enganche reactivo al iframe de descripción
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
