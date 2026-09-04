@@ -4,6 +4,8 @@
 // @version      1.0
 // @description  Captura imágenes incluso dentro de iframes y repara el correo al copiar (botón arrastrable)
 // @match        https://apps7v20.vozitel.com/*
+// @updateURL    https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/vozitel-copiar-correo.user.js
+// @downloadURL  https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/vozitel-copiar-correo.user.js
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
