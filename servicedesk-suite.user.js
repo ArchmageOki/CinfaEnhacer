@@ -1220,7 +1220,7 @@
                 tecnico: TECNICO_DEFECTO,
                 tipoTicket: 'Consulta',
                 viaTicket: 'Correo electrónico',
-                ubicacion: 'Olloki',
+                ubicacion: 'Delegados',
                 asunto: 'Portatil delegado - ',
                 descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
             })
