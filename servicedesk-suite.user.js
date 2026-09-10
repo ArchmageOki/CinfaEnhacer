@@ -1004,6 +1004,34 @@
             })
         },
         {
+            nombre: "✅ Usuario (modificación)",
+            obtenerDatos: () => ({
+                grupo: 'Administrativa',
+                subgrupo: 'Usuario',
+                elemento: 'Modificacion',
+                grupoAsignado: 'Front Office',
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Usuario - Modificacion - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
+        },
+        {
+            nombre: "✅ Usuario (reincorporación)",
+            obtenerDatos: () => ({
+                grupo: 'Administrativa',
+                subgrupo: 'Usuario',
+                elemento: 'Modificacion',
+                grupoAsignado: 'Front Office',
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Usuario - Reincorporacion - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
+        },
+        {
             nombre: "🪑 Salas",
             obtenerDatos: () => ({
                 grupo: 'Administrativa',
