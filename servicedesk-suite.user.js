@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.9
+// @version      2.10
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -1293,6 +1293,20 @@
                 viaTicket: 'Correo electrónico',
                 ubicacion: 'Olloki',
                 asunto: 'Docuware - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
+        },
+        {
+            nombre: "©️ StarLims",
+            obtenerDatos: () => ({
+                grupo: 'Aplicaciones corporativas',
+                subgrupo: 'Starlims',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Aplicaciones',
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'StarLims - ',
                 descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
             })
         },
