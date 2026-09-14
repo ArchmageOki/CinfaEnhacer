@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.10
-// @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos, Cerrar/Rechazar, Plantillas y Resoluciones)
+// @version      2.11
+// @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos con estado activo, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
 // @updateURL    https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/servicedesk-suite.user.js
@@ -125,22 +125,32 @@
                 justify-content: center !important;
                 min-width: 19px !important;
                 height: 19px !important;
-                padding: 0 3px !important;
+                padding: 0 4px !important;
                 background-color: #f7f7f7 !important;
                 border: 1px solid #c9c9c9 !important;
                 border-radius: 2px !important;
-                color: #333333 !important;
+                color: #555555 !important;
                 font-size: 10px !important;
                 font-weight: 700 !important;
                 cursor: pointer !important;
                 user-select: none !important;
                 box-sizing: border-box !important;
+                transition: all 0.12s ease !important;
             }
             .sdp-quick-btn:hover {
                 background-color: #e6f0fa !important;
                 border-color: #2b78e4 !important;
                 color: #1a56a6 !important;
             }
+
+            /* ESTILO DESTACADO: Botón activo / seleccionado */
+            .sdp-quick-btn.is-active {
+                background-color: #007bff !important;
+                border-color: #0056b3 !important;
+                color: #ffffff !important;
+                box-shadow: 0 1px 3px rgba(0, 123, 255, 0.35) !important;
+            }
+
             .sdp-quick-btn.is-done {
                 background-color: #e6f4ea !important;
                 border-color: #34a853 !important;
@@ -627,17 +637,15 @@
         const estaCerradoPorAttr = panel && panel.getAttribute('aria-expanded') === 'false';
         const estaCerradoPorEstilo = contentBox && (contentBox.style.display === 'none' || getComputedStyle(contentBox).display === 'none');
 
-        // 1. Abrir el panel si está colapsado
         if (estaCerradoPorAttr || estaCerradoPorEstilo) {
             const heading = document.querySelector('z-cpheading.zcollapsiblepanel__heading') || (panel ? panel.querySelector('.zcollapsiblepanel__header') : null);
             if (heading) {
                 const toggleBtn = heading.querySelector('.p10') || heading;
                 toggleBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-                await wait(280); // Esperar a que la animación termine de renderizar el iframe
+                await wait(280);
             }
         }
 
-        // 2. Localizar y enfocar el editor dentro de la resolución
         const zeContainer = document.getElementById('ze_form_req-form_resolution_content') || document.getElementById('resolution.content_control');
         const iframe = zeContainer ? zeContainer.querySelector('iframe') : document.querySelector('#rf-resolutionBox iframe');
 
@@ -655,7 +663,6 @@
                     win.focus();
                     targetEl.focus();
 
-                    // Colapsar el cursor al inicio del texto
                     const sel = win.getSelection();
                     if (sel) {
                         const range = doc.createRange();
@@ -671,7 +678,6 @@
             }
         }
 
-        // Respaldo para textarea simple si no hay editor enriquecido
         const resTextarea = document.getElementById('form_req-form_resolution_content') || document.querySelector('textarea[name="resolution.content"]');
         if (resTextarea) {
             resTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -816,7 +822,7 @@
     }
 
     // =========================================================================
-    // 6. MÓDULO: BOTONES RÁPIDOS DE CAMPOS
+    // 6. MÓDULO: BOTONES RÁPIDOS DE CAMPOS CON ESTADO ACTIVO
     // =========================================================================
     const CONFIG_GRUPOS = [
         {
@@ -835,7 +841,7 @@
             botones: [
                 { etiqueta: 'Front', valor: 'Front Office', titulo: 'Grupo Asignado: Front' },
                 { etiqueta: 'SOAP', valor: 'Aplicaciones', titulo: 'Grupo Asignado: Aplicaciones' },
-                { etiqueta: 'Onsite',  valor: 'On-site', titulo: 'Grupo Asignado: On-site' },
+                { etiqueta: 'Onsite', valor: 'On-site', titulo: 'Grupo Asignado: On-site' },
                 { etiqueta: 'A', valor: 'Alcala', titulo: 'Grupo Asignado: Alcalá' },
             ],
             extraAccion: async () => { await selectByName('technician', 'Sin especificar'); }
@@ -861,9 +867,9 @@
             fname: 'udf_fields.udf_pick_2724',
             inputName: 'udf_fields.udf_pick_2724',
             botones: [
-                { etiqueta: 'Correo',  valor: 'Correo electrónico', titulo: 'Vía ticket: Correo electrónico' },
-                { etiqueta: 'Tlf', valor: 'Teléfono',           titulo: 'Vía ticket: Teléfono' },
-                { etiqueta: 'Presencial',   valor: 'Presencial',         titulo: 'Vía ticket: Presencial' }
+                { etiqueta: 'Correo',     valor: 'Correo electrónico', titulo: 'Vía ticket: Correo electrónico' },
+                { etiqueta: 'Tlf',        valor: 'Teléfono',           titulo: 'Vía ticket: Teléfono' },
+                { etiqueta: 'Presencial', valor: 'Presencial',         titulo: 'Vía ticket: Presencial' }
             ]
         },
         {
@@ -871,13 +877,56 @@
             inputName: 'udf_fields.udf_pick_2725',
             botones: [
                 { etiqueta: 'Areta',  valor: 'Areta',        titulo: 'Ubicación: Areta' },
-                { etiqueta: 'Olloki',   valor: 'Olloki',       titulo: 'Ubicación: Olloki' },
-                { etiqueta: 'Neo', valor: 'Neo',          titulo: 'Ubicación: Neo' },
-                { etiqueta: 'Del', valor: 'Delegados',    titulo: 'Ubicación: Delegados' },
-                { etiqueta: 'A',  valor: 'Cinfa-Alcala', titulo: 'Ubicación: Cinfa-Alcala' }
+                { etiqueta: 'Olloki', valor: 'Olloki',       titulo: 'Ubicación: Olloki' },
+                { etiqueta: 'Neo',    valor: 'Neo',          titulo: 'Ubicación: Neo' },
+                { etiqueta: 'Del',    valor: 'Delegados',    titulo: 'Ubicación: Delegados' },
+                { etiqueta: 'A',      valor: 'Cinfa-Alcala', titulo: 'Ubicación: Cinfa-Alcala' }
             ]
         }
     ];
+
+    // Función que sincroniza visualmente el botón activo leyendo el valor actual del campo
+    function actualizarEstadosBotonesActivos() {
+        if (!esModoValido()) return;
+
+        CONFIG_GRUPOS.forEach(grupo => {
+            const row = document.querySelector(`.fafr-row[data-fname="${grupo.fname}"]`);
+            if (!row) return;
+
+            // Leer texto seleccionado en el Select2 nativo de SDP o en el control estándar
+            const chosenSpan = row.querySelector('.select2-chosen') ||
+                               row.querySelector('.select2-choice') ||
+                               row.querySelector('.form-control-static');
+            
+            const selectNative = row.querySelector(`select[name="${grupo.inputName}"]`);
+            const inputNative = row.querySelector(`input[name="${grupo.inputName}"]`);
+
+            let textoActual = '';
+            if (chosenSpan) {
+                textoActual = chosenSpan.innerText || chosenSpan.textContent || '';
+            } else if (selectNative && selectNative.selectedIndex >= 0) {
+                textoActual = selectNative.options[selectNative.selectedIndex].text || '';
+            } else if (inputNative) {
+                textoActual = inputNative.value || '';
+            }
+
+            textoActual = textoActual.trim().toLowerCase();
+
+            const wrapperId = `sdp-quick-group-${grupo.fname.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+            const groupContainer = document.getElementById(wrapperId);
+            if (!groupContainer) return;
+
+            const botones = groupContainer.querySelectorAll('.sdp-quick-btn');
+            botones.forEach(btn => {
+                const targetValor = (btn.dataset.targetVal || '').trim().toLowerCase();
+                if (targetValor && (textoActual === targetValor || textoActual.includes(targetValor))) {
+                    btn.classList.add('is-active');
+                } else {
+                    btn.classList.remove('is-active');
+                }
+            });
+        });
+    }
 
     function inyectarBotonesCampos() {
         if (!esModoValido()) return;
@@ -902,6 +951,7 @@
                 btn.className = 'sdp-quick-btn';
                 btn.textContent = btnConfig.etiqueta;
                 btn.title = btnConfig.titulo;
+                btn.dataset.targetVal = btnConfig.valor; // Guardar valor para comprobación de estado
 
                 btn.addEventListener('click', async (e) => {
                     e.preventDefault();
@@ -915,6 +965,7 @@
                     if (ok) {
                         btn.classList.add('is-done');
                         setTimeout(() => btn.classList.remove('is-done'), 700);
+                        actualizarEstadosBotonesActivos();
                     }
                 });
 
@@ -928,6 +979,8 @@
                 label.insertBefore(groupContainer, label.firstChild);
             }
         });
+
+        actualizarEstadosBotonesActivos();
     }
 
     // =========================================================================
@@ -1545,6 +1598,8 @@
         if (config.viaTicket)     await selectByName('udf_fields.udf_pick_2724', config.viaTicket);
         if (config.ubicacion)     await selectByName('udf_fields.udf_pick_2725', config.ubicacion);
         if (config.estado)        await selectByName('status', config.estado);
+
+        actualizarEstadosBotonesActivos();
     }
 
     function inyectarSelect2Plantillas() {
@@ -1654,7 +1709,6 @@
     ];
 
     async function sobrescribirResolucion(htmlContent) {
-        // Localizar el iframe del editor Ze específico de resolución
         const zeContainer = document.getElementById('ze_form_req-form_resolution_content') || document.getElementById('resolution.content_control');
         const iframe = zeContainer ? zeContainer.querySelector('iframe') : document.querySelector('#rf-resolutionBox iframe');
 
@@ -1662,10 +1716,8 @@
             try {
                 const doc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
                 if (doc && doc.body) {
-                    // Limpiar y escribir contenido
                     doc.body.innerHTML = htmlContent ? `<div>${htmlContent}</div>` : '<div><br></div>';
 
-                    // Forzar eventos de entrada que actualizan el store de SDP
                     doc.body.dispatchEvent(new Event('input', { bubbles: true }));
                     doc.body.dispatchEvent(new Event('change', { bubbles: true }));
 
@@ -1679,7 +1731,6 @@
             }
         }
 
-        // Sincronizar el textarea nativo que envía el formulario
         const textarea = document.getElementById('form_req-form_resolution_content') || document.querySelector('textarea[name="resolution.content"]');
         if (textarea) {
             textarea.value = htmlContent;
@@ -1716,7 +1767,6 @@
             const li = document.createElement('li');
             li.innerText = resItem.titulo;
 
-            // Uso de mousedown para ganarle a cualquier blur o ciclo de eventos nativos
             li.addEventListener('mousedown', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -1878,6 +1928,7 @@
         inyectarBotonesCampos();
         inyectarSelect2Plantillas();
         inyectarBotonResoluciones();
+        actualizarEstadosBotonesActivos();
     }
 
     const observer = new MutationObserver(() => cicloPrincipal());
