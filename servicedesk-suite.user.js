@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.11
+// @version      2.12
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos con estado activo, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -840,7 +840,7 @@
             inputName: 'udf_fields.udf_pick_2726',
             botones: [
                 { etiqueta: 'Front', valor: 'Front Office', titulo: 'Grupo Asignado: Front' },
-                { etiqueta: 'SOAP', valor: 'Aplicaciones', titulo: 'Grupo Asignado: Aplicaciones' },
+                { etiqueta: 'Apl', valor: 'Aplicaciones', titulo: 'Grupo Asignado: Aplicaciones' },
                 { etiqueta: 'Onsite', valor: 'On-site', titulo: 'Grupo Asignado: On-site' },
                 { etiqueta: 'A', valor: 'Alcala', titulo: 'Grupo Asignado: Alcalá' },
             ],
