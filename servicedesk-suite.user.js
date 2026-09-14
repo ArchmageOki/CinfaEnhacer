@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.12
+// @version      2.13
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos con estado activo, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -867,8 +867,8 @@
             fname: 'udf_fields.udf_pick_2724',
             inputName: 'udf_fields.udf_pick_2724',
             botones: [
-                { etiqueta: 'Correo',     valor: 'Correo electrónico', titulo: 'Vía ticket: Correo electrónico' },
-                { etiqueta: 'Tlf',        valor: 'Teléfono',           titulo: 'Vía ticket: Teléfono' },
+                { etiqueta: '📩',     valor: 'Correo electrónico', titulo: 'Vía ticket: Correo electrónico' },
+                { etiqueta: '📞',        valor: 'Teléfono',           titulo: 'Vía ticket: Teléfono' },
                 { etiqueta: 'Presencial', valor: 'Presencial',         titulo: 'Vía ticket: Presencial' }
             ]
         },
