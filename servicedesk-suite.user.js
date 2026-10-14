@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.13
+// @version      2.14
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos con estado activo, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -1012,6 +1012,26 @@
         },
         */
         {
+            nombre: "✅ Alta",
+            obtenerDatos: () => ({
+                grupo: 'Administrativa',
+                subgrupo: 'Usuario',
+                elemento: 'Alta',
+                grupoAsignado: 'Front Office',
+                tipoTicket: 'Petición',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Usuario - Alta - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>
+                Perfil similar: <br>
+                Modificación en AD: <br>
+                VDI asignado: <br>
+                Sincronización en Aniceto: <br>
+                Sincronización en Lotus: <br>
+                Material informático: `
+            })
+        },
+        {
             nombre: "✅ Alta Eduardo Infante",
             obtenerDatos: () => ({
                 solicitante: 'eduardo.infante@cinfa.com',
@@ -1137,6 +1157,20 @@
                 viaTicket: 'Correo electrónico',
                 ubicacion: 'Olloki',
                 asunto: 'GII - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
+        },
+        {
+            nombre: "🟦 SalesForce",
+            obtenerDatos: () => ({
+                grupo: 'Aplicaciones corporativas',
+                subgrupo: 'SalesForce',
+                elemento: 'Funcionamiento',
+                grupoAsignado: 'Aplicaciones',
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Delegados',
+                asunto: 'SalesForce - ',
                 descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
             })
         },
@@ -1288,6 +1322,21 @@
                 viaTicket: 'Correo electrónico',
                 ubicacion: 'Olloki',
                 asunto: 'Servidor - ',
+                descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
+            })
+        },
+        {
+            nombre: "⚒️ Hardware (thinclient)",
+            obtenerDatos: () => ({
+                grupo: 'Hardware',
+                subgrupo: 'Thinclient',
+                elemento: 'Configuracion',
+                grupoAsignado: 'Front Office',
+                tecnico: TECNICO_DEFECTO,
+                tipoTicket: 'Consulta',
+                viaTicket: 'Correo electrónico',
+                ubicacion: 'Olloki',
+                asunto: 'Thinclient - ',
                 descripcion: `<b>${getFechaHoy()} ${TECNICO_DEFECTO}</b><br><br>`
             })
         },
