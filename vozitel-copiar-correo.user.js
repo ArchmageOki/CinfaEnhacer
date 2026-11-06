@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Vozitel - Copiar Correo con Imágenes para ServiceDesk
 // @namespace    https://vozitel.com/
-// @version      1.1
+// @version      1.2
 // @description  Captura imágenes incluso dentro de iframes y repara el correo al copiar (botón arrastrable)
 // @match        https://apps7v20.vozitel.com/*
 // @updateURL    https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/vozitel-copiar-correo.user.js
 // @downloadURL  https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/vozitel-copiar-correo.user.js
-// @grant        GM_setClipboard
+// @grant        none
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -77,53 +77,80 @@
         return hasToolbar && !hasReplyAllButton;
     }
 
-    async function copyRichText(htmlContent, plainText) {
-        // 1. Vía prioritaria: API nativa del gestor de Userscripts (inmune a pérdida de foco)
-        if (typeof GM_setClipboard === 'function') {
+    // Copia enriquecida inmune al bloqueo de foco de Chrome
+    function copyRichText(htmlContent, plainText) {
+        return new Promise((resolve, reject) => {
+            // Intentar recuperar el foco al frame actual
+            window.focus();
+
+            // 1. Método DOM Range + execCommand (no requiere foco previo en ventana)
+            const tempDiv = document.createElement('div');
+            tempDiv.contentEditable = 'true';
+            tempDiv.style.position = 'fixed';
+            tempDiv.style.left = '-9999px';
+            tempDiv.style.top = '0';
+            tempDiv.style.opacity = '0';
+            tempDiv.style.pointerEvents = 'none';
+            tempDiv.innerHTML = htmlContent;
+
+            document.body.appendChild(tempDiv);
+
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(tempDiv);
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            let success = false;
             try {
-                GM_setClipboard(htmlContent, { type: 'html', minType: 'text/html' });
-                return true;
-            } catch (e) {
-                console.warn('GM_setClipboard falló, probando alternativas...', e);
+                success = document.execCommand('copy');
+            } catch (err) {
+                console.warn('execCommand falló:', err);
             }
-        }
 
-        // Recuperar foco activo de la ventana principal
-        window.focus();
+            selection.removeAllRanges();
+            document.body.removeChild(tempDiv);
 
-        // 2. Vía secundaria: Clipboard API asíncrona estándar
-        if (navigator.clipboard && window.ClipboardItem) {
-            try {
+            if (success) {
+                resolve(true);
+                return;
+            }
+
+            // 2. Fallback secundario mediante listener de copy
+            let listenerApplied = false;
+            const copyHandler = (e) => {
+                e.preventDefault();
+                e.clipboardData.setData('text/html', htmlContent);
+                e.clipboardData.setData('text/plain', plainText);
+                listenerApplied = true;
+            };
+
+            document.addEventListener('copy', copyHandler);
+            const fallbackSuccess = document.execCommand('copy');
+            document.removeEventListener('copy', copyHandler);
+
+            if (fallbackSuccess && listenerApplied) {
+                resolve(true);
+                return;
+            }
+
+            // 3. Fallback terciario con Clipboard API
+            if (navigator.clipboard && window.ClipboardItem) {
                 const blobHtml = new Blob([htmlContent], { type: 'text/html' });
                 const blobText = new Blob([plainText], { type: 'text/plain' });
-                await navigator.clipboard.write([
+                navigator.clipboard.write([
                     new ClipboardItem({
                         'text/html': blobHtml,
                         'text/plain': blobText
                     })
-                ]);
-                return true;
-            } catch (e) {
-                console.warn('navigator.clipboard.write falló, probando execCommand...', e);
+                ])
+                .then(() => resolve(true))
+                .catch(err => reject(err));
+                return;
             }
-        }
 
-        // 3. Fallback clásico mediante evento copy simulado
-        let listenerApplied = false;
-        const copyHandler = (e) => {
-            e.preventDefault();
-            e.clipboardData.setData('text/html', htmlContent);
-            e.clipboardData.setData('text/plain', plainText);
-            listenerApplied = true;
-        };
-
-        document.addEventListener('copy', copyHandler);
-        const success = document.execCommand('copy');
-        document.removeEventListener('copy', copyHandler);
-
-        if (success && listenerApplied) return true;
-
-        throw new Error('No se pudo acceder al portapapeles por restricciones de foco del navegador');
+            reject(new Error('No se pudo acceder al portapapeles.'));
+        });
     }
 
     function extractSenderEmail() {
@@ -251,7 +278,7 @@
 
                 let raw = textarea.value;
 
-                // 1. Detectar el email del remitente si venía en el textarea o en la vista
+                // 1. Detectar remitente
                 let detectedSenderEmail = '';
                 const senderLineMatch = raw.match(/Remitente:([^\n\r<]+)(?:<|&lt;)?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})?(?:>|&gt;)?/i);
                 if (senderLineMatch && senderLineMatch[2]) {
@@ -260,21 +287,21 @@
                     detectedSenderEmail = extractSenderEmail();
                 }
 
-                // 2. Normalizar la línea de Remitente preservando el salto de línea <br />
+                // 2. Normalizar Remitente
                 raw = raw.replace(/Remitente:[^\n\r<]+(?:(?:<|&lt;)[^>\n\r]+(?:>|&gt;))?(?:<br\s*\/?>)?/i, (match) => {
                     const nameOnly = match.replace(/^Remitente:\s*/i, '').replace(/(?:<|&lt;).*$/, '').replace(/<br\s*\/?>/gi, '').trim();
                     const emailPart = detectedSenderEmail ? ` &lt;${detectedSenderEmail}&gt;` : '';
                     return `Remitente: ${nameOnly}${emailPart}<br />`;
                 });
 
-                // 3. Normalizar la línea de Destinatario preservando el salto de línea <br />
+                // 3. Normalizar Destinatario
                 raw = raw.replace(/Destinatario:[^\n\r<]+(?:(?:<|&lt;)[^>\n\r]+(?:>|&gt;))?(?:<br\s*\/?>)?/i, (match) => {
                     const nameOnly = match.replace(/^Destinatario:\s*/i, '').replace(/(?:<|&lt;).*$/, '').replace(/<br\s*\/?>/gi, '').trim();
                     const destEmail = 'helpdesk@cinfa.com';
                     return `Destinatario: ${nameOnly || 'HelpDesk CINFA'} &lt;${destEmail}&gt;<br />`;
                 });
 
-                // 4. Proteger cualquier otro correo entre <...>
+                // 4. Proteger correos entre <...>
                 raw = raw.replace(/<([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>/g, '&lt;$1&gt;');
 
                 let tempDiv = document.createElement('div');
