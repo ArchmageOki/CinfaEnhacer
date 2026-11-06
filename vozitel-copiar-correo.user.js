@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Vozitel - Copiar Correo con Imágenes para ServiceDesk
 // @namespace    https://vozitel.com/
-// @version      1.0
+// @version      1.1
 // @description  Captura imágenes incluso dentro de iframes y repara el correo al copiar (botón arrastrable)
 // @match        https://apps7v20.vozitel.com/*
 // @updateURL    https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/vozitel-copiar-correo.user.js
 // @downloadURL  https://github.com/ArchmageOki/CinfaEnhacer/raw/refs/heads/main/vozitel-copiar-correo.user.js
-// @grant        none
+// @grant        GM_setClipboard
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -78,6 +78,37 @@
     }
 
     async function copyRichText(htmlContent, plainText) {
+        // 1. Vía prioritaria: API nativa del gestor de Userscripts (inmune a pérdida de foco)
+        if (typeof GM_setClipboard === 'function') {
+            try {
+                GM_setClipboard(htmlContent, { type: 'html', minType: 'text/html' });
+                return true;
+            } catch (e) {
+                console.warn('GM_setClipboard falló, probando alternativas...', e);
+            }
+        }
+
+        // Recuperar foco activo de la ventana principal
+        window.focus();
+
+        // 2. Vía secundaria: Clipboard API asíncrona estándar
+        if (navigator.clipboard && window.ClipboardItem) {
+            try {
+                const blobHtml = new Blob([htmlContent], { type: 'text/html' });
+                const blobText = new Blob([plainText], { type: 'text/plain' });
+                await navigator.clipboard.write([
+                    new ClipboardItem({
+                        'text/html': blobHtml,
+                        'text/plain': blobText
+                    })
+                ]);
+                return true;
+            } catch (e) {
+                console.warn('navigator.clipboard.write falló, probando execCommand...', e);
+            }
+        }
+
+        // 3. Fallback clásico mediante evento copy simulado
         let listenerApplied = false;
         const copyHandler = (e) => {
             e.preventDefault();
@@ -92,19 +123,7 @@
 
         if (success && listenerApplied) return true;
 
-        if (navigator.clipboard && window.ClipboardItem) {
-            const blobHtml = new Blob([htmlContent], { type: 'text/html' });
-            const blobText = new Blob([plainText], { type: 'text/plain' });
-            await navigator.clipboard.write([
-                new ClipboardItem({
-                    'text/html': blobHtml,
-                    'text/plain': blobText
-                })
-            ]);
-            return true;
-        }
-
-        throw new Error('No compatible con el portapapeles');
+        throw new Error('No se pudo acceder al portapapeles por restricciones de foco del navegador');
     }
 
     function extractSenderEmail() {
@@ -175,7 +194,6 @@
                 initialTop = rect.top;
 
                 btn.style.cursor = 'grabbing';
-                e.preventDefault();
             });
 
             document.addEventListener('mousemove', (e) => {
