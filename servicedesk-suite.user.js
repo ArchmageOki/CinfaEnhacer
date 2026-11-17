@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.15
+// @version      2.2
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos con estado activo, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
@@ -489,7 +489,7 @@
             const searchInput = document.querySelector('#select2-drop .select2-search input');
             if (!searchInput) return false;
 
-            const textoTeclear = criterio.includes('@') ? criterio.split('@')[0].replace('.', ' ') : criterio;
+            const textoTeclear = criterio.includes('@') ? criterio.split('@')[0] : criterio;
             searchInput.value = textoTeclear;
             searchInput.dispatchEvent(new Event('input', { bubbles: true }));
             searchInput.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true }));
@@ -1614,26 +1614,6 @@
                 subject.value = config.asunto;
                 subject.dispatchEvent(new Event('input', { bubbles: true }));
                 subject.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-        }
-
-        if (config.descripcion) {
-            const iframes = Array.from(document.querySelectorAll('iframe'));
-            for (let f of iframes) {
-                try {
-                    const doc = f.contentDocument || (f.contentWindow && f.contentWindow.document);
-                    if (doc && doc.body && (doc.body.classList.contains('ze_body') || doc.body.getAttribute('contenteditable') === 'true')) {
-                        if (f.closest('#resolution\\.content_control') || f.closest('#rf-resolutionBox')) continue;
-                        doc.body.innerHTML = `<div>${config.descripcion}</div>`;
-                        doc.body.dispatchEvent(new Event('input', { bubbles: true }));
-                        break;
-                    }
-                } catch (e) {}
-            }
-            const hiddenTextarea = document.querySelector('textarea[name="description"]');
-            if (hiddenTextarea) {
-                hiddenTextarea.value = config.descripcion;
-                hiddenTextarea.dispatchEvent(new Event('change', { bubbles: true }));
             }
         }
 
