@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CinfaEnhancer - ServiceDesk Suite
 // @namespace    http://tampermonkey.net/
-// @version      2.2
+// @version      2.16
 // @description  Suite integral de automatización para ServiceDesk Plus (Cabecera, Campos rápidos con estado activo, Cerrar/Rechazar, Plantillas y Resoluciones)
 // @author       Tú
 // @match        https://servicedesk.helphone.com:8181/*
